@@ -3,51 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tetris Mobile v2</title>
+    <title>Tetris Mobile v3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&display=swap');
 
+        /* Theme Variables - Default (Neon) */
         :root {
-            --bg-color: #0f0f1a;
-            --ui-bg: #1a1a2e;
-            --accent: #ff0055;
+            --bg-body: #0f0f1a;
+            --bg-canvas: rgba(0, 0, 0, 0.9);
+            --grid-line: rgba(255, 255, 255, 0.1);
+            --text-main: #fff;
+            --text-accent: #ff0055;
+            --ui-border: rgba(255, 255, 255, 0.15);
+            --btn-bg: rgba(255, 255, 255, 0.08);
+            --font-main: 'Chakra Petch', sans-serif;
+        }
+
+        /* Retro Gameboy Theme */
+        body.theme-retro {
+            --bg-body: #8b9c48;
+            --bg-canvas: #9bbc0f;
+            --grid-line: rgba(15, 56, 15, 0.2);
+            --text-main: #0f380f;
+            --text-accent: #306230;
+            --ui-border: #306230;
+            --btn-bg: rgba(15, 56, 15, 0.1);
+            --font-main: 'VT323', monospace;
+        }
+
+        /* Classic Theme */
+        body.theme-classic {
+            --bg-body: #2c3e50;
+            --bg-canvas: #000000;
+            --grid-line: #333;
+            --text-main: #ecf0f1;
+            --text-accent: #f1c40f;
+            --ui-border: #7f8c8d;
+            --btn-bg: rgba(255, 255, 255, 0.1);
+            --font-main: sans-serif;
         }
 
         body {
-            font-family: 'Chakra Petch', sans-serif;
-            background-color: var(--bg-color);
-            color: white;
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
             overflow: hidden;
             touch-action: none;
-            height: 100dvh; /* Use dynamic viewport height for mobile browsers */
+            height: 100dvh;
             width: 100vw;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .game-canvas {
             image-rendering: pixelated;
-            background-color: rgba(0, 0, 0, 0.9);
-            border: 2px solid #333;
-            /* Critical fix: ensures canvas scales down but never exceeds container */
-            max-height: 100%; 
+            background-color: var(--bg-canvas);
+            border: 2px solid var(--ui-border);
+            max-height: 100%;
             max-width: 100%;
-            object-fit: contain;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .control-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--btn-bg);
+            border: 1px solid var(--ui-border);
             backdrop-filter: blur(4px);
             transition: transform 0.05s, background 0.05s;
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
+            color: var(--text-main);
         }
-        .control-btn:active {
-            background: rgba(255, 255, 255, 0.25);
+        
+        .control-btn:active, .control-btn.active-state {
+            background: var(--text-accent);
+            color: var(--bg-body);
             transform: scale(0.92);
+            border-color: var(--text-accent);
         }
 
         .d-pad-grid {
@@ -57,7 +91,7 @@
             width: 150px;
         }
 
-        /* CRT Scanline overlay */
+        /* Scanlines only visible on Neon theme */
         .scanlines {
             background: linear-gradient(
                 to bottom,
@@ -71,69 +105,81 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: 5;
+            opacity: 1;
+        }
+        body.theme-retro .scanlines, body.theme-classic .scanlines {
+            opacity: 0.1; /* Faint on other themes */
         }
         
         .disabled-hold {
             opacity: 0.3;
         }
+
+        .theme-btn {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border: 1px solid var(--ui-border);
+            border-radius: 4px;
+            margin-bottom: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-between p-2">
 
-    <!-- Top Bar: Hold, Score, Next -->
+    <!-- Top Bar -->
     <div class="w-full max-w-lg flex justify-between items-start h-[15dvh] pt-2 z-10">
         <!-- Hold Box -->
-        <div class="flex flex-col items-center">
-            <div class="text-[10px] text-gray-400 font-bold mb-1 tracking-wider">HOLD</div>
-            <canvas id="hold-canvas" width="80" height="80" class="bg-black/50 border border-gray-700 rounded w-[50px] h-[50px] sm:w-[70px] sm:h-[70px]"></canvas>
+        <div class="flex flex-col items-center w-20">
+            <div class="text-[10px] opacity-70 font-bold mb-1 tracking-wider">HOLD</div>
+            <canvas id="hold-canvas" width="80" height="80" class="game-canvas rounded w-[50px] h-[50px] sm:w-[60px] sm:h-[60px]"></canvas>
         </div>
 
-        <!-- Score Board -->
-        <div class="flex flex-col items-center justify-center pt-2">
-            <h1 class="text-yellow-400 text-lg font-bold tracking-widest drop-shadow-md">TETRIS</h1>
-            <div class="text-2xl font-mono text-white mt-1" id="score">0</div>
-            <div class="text-[10px] text-gray-500">LEVEL <span id="level">1</span></div>
+        <!-- Center Info -->
+        <div class="flex flex-col items-center justify-start pt-1">
+            <button id="theme-btn" class="theme-btn">THEME: NEON</button>
+            <div class="text-3xl font-bold tracking-widest mt-1" id="score">0</div>
+            <div class="text-[10px] opacity-60">LEVEL <span id="level">1</span></div>
         </div>
 
         <!-- Next Box -->
-        <div class="flex flex-col items-center">
-            <div class="text-[10px] text-gray-400 font-bold mb-1 tracking-wider">NEXT</div>
-            <canvas id="next-canvas" width="80" height="80" class="bg-black/50 border border-gray-700 rounded w-[50px] h-[50px] sm:w-[70px] sm:h-[70px]"></canvas>
+        <div class="flex flex-col items-center w-20">
+            <div class="text-[10px] opacity-70 font-bold mb-1 tracking-wider">NEXT</div>
+            <canvas id="next-canvas" width="80" height="80" class="game-canvas rounded w-[50px] h-[50px] sm:w-[60px] sm:h-[60px]"></canvas>
         </div>
     </div>
 
-    <!-- Game Board Container -->
-    <!-- flex-1 min-h-0 is the CSS Magic that prevents overflow. It tells flexbox "I can shrink to 0 height if needed" -->
+    <!-- Game Board -->
     <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-2">
         <div class="relative h-full w-full flex items-center justify-center">
             <canvas id="tetris" width="240" height="400" class="game-canvas"></canvas>
             <div class="scanlines"></div>
             
             <!-- Pause/Start Overlay -->
-            <div id="overlay" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center z-20 rounded">
-                <h2 id="overlay-title" class="text-4xl text-yellow-400 font-bold mb-2 tracking-tighter">READY?</h2>
-                <div class="text-xs text-gray-400 mb-8 font-mono">HIGH SCORE: <span id="high-score">0</span></div>
-                <button id="start-btn" class="px-8 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white font-bold rounded shadow-lg active:scale-95 transition-transform">
+            <div id="overlay" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center z-20 rounded border-2 border-[var(--ui-border)]">
+                <h2 id="overlay-title" class="text-4xl font-bold mb-2 tracking-tighter text-[var(--text-accent)]">TETRIS</h2>
+                <div class="text-xs opacity-70 mb-8 font-mono">HIGH SCORE: <span id="high-score">0</span></div>
+                <button id="start-btn" class="px-8 py-4 bg-[var(--text-accent)] text-[var(--bg-body)] font-bold rounded shadow-lg active:scale-95 transition-transform border border-white/20">
                     START GAME
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Controls Area -->
+    <!-- Controls -->
     <div class="w-full max-w-lg h-[25dvh] grid grid-cols-2 gap-4 pb-2 select-none z-10">
         
         <!-- Left Side: D-Pad -->
         <div class="flex items-center justify-center">
             <div class="d-pad-grid">
                 <!-- Row 1 -->
-                <button class="control-btn rounded-lg h-12 flex items-center justify-center bg-gray-800/50" id="btn-hold">
-                    <span class="text-[10px] font-bold text-gray-300">HOLD</span>
+                <button class="control-btn rounded-lg h-12 flex items-center justify-center" id="btn-hold">
+                    <span class="text-[10px] font-bold">HOLD</span>
                 </button>
                 <button class="control-btn rounded-lg h-12 flex items-center justify-center" id="btn-rotate">
                     <i class="fas fa-undo transform rotate-180 text-sm"></i>
                 </button>
-                <div class="h-12"></div> <!-- Empty -->
+                <div class="h-12"></div> 
 
                 <!-- Row 2 -->
                 <button class="control-btn rounded-lg h-12 flex items-center justify-center" id="btn-left">
@@ -148,11 +194,11 @@
             </div>
         </div>
 
-        <!-- Right Side: Big Action Button -->
+        <!-- Right Side: Fast Drop (Hold to Speed Up) -->
         <div class="flex items-center justify-center pr-4">
-            <button class="control-btn rounded-full w-24 h-24 bg-red-500/10 border-red-500/30 flex flex-col items-center justify-center gap-1 active:bg-red-500/30" id="btn-drop">
-                <i class="fas fa-arrow-down text-2xl text-red-400"></i>
-                <span class="text-[10px] font-bold text-red-300 tracking-wider">DROP</span>
+            <button class="control-btn rounded-full w-24 h-24 flex flex-col items-center justify-center gap-1" id="btn-drop">
+                <i class="fas fa-angle-double-down text-3xl"></i>
+                <span class="text-[10px] font-bold tracking-wider">FAST</span>
             </button>
         </div>
     </div>
@@ -165,6 +211,7 @@
         const holdCanvas = document.getElementById('hold-canvas');
         const holdContext = holdCanvas.getContext('2d');
 
+        // UI Elements
         const scoreElement = document.getElementById('score');
         const levelElement = document.getElementById('level');
         const highScoreElement = document.getElementById('high-score');
@@ -172,34 +219,81 @@
         const overlayTitle = document.getElementById('overlay-title');
         const startBtn = document.getElementById('start-btn');
         const holdBtn = document.getElementById('btn-hold');
+        const themeBtn = document.getElementById('theme-btn');
+        const body = document.body;
 
         // Scale setup
-        context.scale(20, 20); // 240/12 = 20, 400/20 = 20. Block size is 1 unit.
-        nextContext.scale(15, 15); // Smaller scale for preview
+        context.scale(20, 20); 
+        nextContext.scale(15, 15); 
         holdContext.scale(15, 15);
 
-        // Colors
-        const COLORS = [
-            null,
-            '#FF0D72', // T
-            '#0DC2FF', // I
-            '#0DFF72', // S
-            '#F538FF', // Z
-            '#FF8E0D', // L
-            '#FFE138', // J
-            '#3877FF', // O
+        // --- Themes ---
+        const THEMES = [
+            {
+                name: 'NEON',
+                id: '', // Default class
+                colors: [
+                    null,
+                    '#FF0D72', '#0DC2FF', '#0DFF72', '#F538FF', '#FF8E0D', '#FFE138', '#3877FF'
+                ],
+                grid: 'rgba(255,255,255,0.05)'
+            },
+            {
+                name: 'RETRO',
+                id: 'theme-retro',
+                colors: [
+                    null,
+                    '#0f380f', '#0f380f', '#0f380f', '#0f380f', '#0f380f', '#0f380f', '#0f380f' 
+                ],
+                grid: 'rgba(15, 56, 15, 0.3)'
+            },
+            {
+                name: 'CLASSIC',
+                id: 'theme-classic',
+                colors: [
+                    null,
+                    'cyan', 'blue', 'orange', 'yellow', 'green', 'purple', 'red'
+                ],
+                grid: '#333'
+            }
         ];
+        
+        let themeIndex = 0;
+        let currentColors = THEMES[0].colors;
 
-        // State
+        themeBtn.addEventListener('click', () => {
+            // Remove old theme class
+            if(THEMES[themeIndex].id) body.classList.remove(THEMES[themeIndex].id);
+            
+            // Cycle
+            themeIndex = (themeIndex + 1) % THEMES.length;
+            
+            // Add new theme class
+            if(THEMES[themeIndex].id) body.classList.add(THEMES[themeIndex].id);
+            
+            // Update internal state
+            currentColors = THEMES[themeIndex].colors;
+            themeBtn.innerText = `THEME: ${THEMES[themeIndex].name}`;
+            
+            draw();
+            drawPreviews();
+        });
+
+        // --- Game State ---
         const arena = createMatrix(12, 20);
+        
         let dropCounter = 0;
         let dropInterval = 1000;
+        let normalSpeed = 1000;
+        const fastSpeed = 50; // Speed when holding button
+        let isFastDropping = false;
+
         let lastTime = 0;
         let isPaused = true;
         let isGameOver = false;
         let score = 0;
         let level = 1;
-        let highScore = localStorage.getItem('tetris_highscore_v2') || 0;
+        let highScore = localStorage.getItem('tetris_hs_v3') || 0;
         highScoreElement.innerText = highScore;
 
         const player = {
@@ -267,60 +361,90 @@
             }
         }
 
+        function drawGrid(ctx, width, height) {
+            ctx.lineWidth = 0.05;
+            ctx.strokeStyle = THEMES[themeIndex].grid;
+            
+            // Vertical lines
+            for (let x = 0; x <= width; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            // Horizontal lines
+            for (let y = 0; y <= height; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
         function drawMatrix(matrix, offset, ctx) {
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
-                        ctx.fillStyle = COLORS[value];
-                        // Draw block
+                        ctx.fillStyle = currentColors[value];
                         ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
                         
-                        // Lighting effect (Bevel)
-                        ctx.lineWidth = 0.05;
-                        ctx.strokeStyle = 'white';
-                        ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
-
-                        // Inner dark
-                        ctx.fillStyle = 'rgba(0,0,0,0.1)';
-                        ctx.fillRect(x + offset.x + 0.1, y + offset.y + 0.1, 0.8, 0.8);
+                        // Retro Theme Logic (Pixel style)
+                        if (themeIndex === 1) { 
+                             ctx.lineWidth = 0.1;
+                             ctx.strokeStyle = '#9bbc0f'; // Gap color
+                             ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                             
+                             // Inner pixel detail
+                             ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                             ctx.fillRect(x + offset.x + 0.2, y + offset.y + 0.2, 0.6, 0.6);
+                        } 
+                        // Modern/Neon Logic
+                        else {
+                            ctx.lineWidth = 0.05;
+                            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                            ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                            
+                            ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                            ctx.fillRect(x + offset.x + 0.1, y + offset.y + 0.1, 0.8, 0.8);
+                        }
                     }
                 });
             });
         }
 
         function draw() {
-            // Fill background
-            context.fillStyle = '#000';
-            context.fillRect(0, 0, canvas.width, canvas.height);
+            // Clear
+            context.clearRect(0, 0, canvas.width, canvas.height); // Use clearRect to let CSS background show if needed
+            
+            // Draw Grid
+            drawGrid(context, 12, 20);
 
             drawMatrix(arena, {x: 0, y: 0}, context);
             drawMatrix(player.matrix, player.pos, context);
         }
 
         function drawPreviews() {
-            // Draw Next
-            nextContext.fillStyle = '#111';
-            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            // Next
+            nextContext.clearRect(0,0, nextCanvas.width, nextCanvas.height);
             if (player.next) {
-                const centerOffset = (5 - player.next[0].length) / 2; // Rough centering
+                const centerOffset = (5 - player.next[0].length) / 2;
                 drawMatrix(player.next, {x: centerOffset, y: 1}, nextContext);
             }
 
-            // Draw Hold
-            holdContext.fillStyle = '#111';
-            holdContext.fillRect(0, 0, holdCanvas.width, holdCanvas.height);
+            // Hold
+            holdContext.clearRect(0,0, holdCanvas.width, holdCanvas.height);
             if (player.hold) {
                 const centerOffset = (5 - player.hold[0].length) / 2;
                 drawMatrix(player.hold, {x: centerOffset, y: 1}, holdContext);
             }
 
-            // Visual feedback for Hold button
+            // UI Feedback
             if (!player.canHold) {
                 holdBtn.classList.add('disabled-hold');
-                holdBtn.style.borderColor = "#333";
+                holdBtn.style.opacity = "0.3";
             } else {
                 holdBtn.classList.remove('disabled-hold');
-                holdBtn.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                holdBtn.style.opacity = "1";
             }
         }
 
@@ -355,23 +479,15 @@
                 playerReset();
                 arenaSweep();
                 updateScore();
-                player.canHold = true; // Re-enable hold after drop
+                player.canHold = true;
                 drawPreviews();
+                
+                // If we were fast dropping, we want to stay fast dropping 
+                // for the next piece until button is released, 
+                // BUT usually in tetris, locking a piece might reset drop delay slightly.
+                // For this simple implementation, we keep dropInterval as is.
             }
             dropCounter = 0;
-        }
-
-        function playerHardDrop() {
-            while (!collide(arena, player)) {
-                player.pos.y++;
-            }
-            player.pos.y--;
-            merge(arena, player);
-            playerReset();
-            arenaSweep();
-            updateScore();
-            player.canHold = true;
-            drawPreviews();
         }
 
         function playerMove(offset) {
@@ -385,16 +501,12 @@
             if (!player.canHold || isPaused || isGameOver) return;
 
             if (player.hold === null) {
-                // First hold
                 player.hold = player.matrix;
-                playerReset(true); // true = don't reset hold flag, we do it here
+                playerReset(true);
             } else {
-                // Swap
                 const temp = player.matrix;
                 player.matrix = player.hold;
                 player.hold = temp;
-                
-                // Reposition new piece
                 player.pos.y = 0;
                 player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
             }
@@ -425,7 +537,7 @@
                 
                 if (score > highScore) {
                     highScore = score;
-                    localStorage.setItem('tetris_highscore_v2', highScore);
+                    localStorage.setItem('tetris_hs_v3', highScore);
                     highScoreElement.innerText = highScore;
                 }
             }
@@ -482,11 +594,16 @@
 
         function updateScore() {
             scoreElement.innerText = score;
-            // Level up every 200 points
             level = Math.floor(score / 200) + 1;
             levelElement.innerText = level;
-            // Increase speed with level
-            dropInterval = Math.max(100, 1000 - (level * 50)); 
+            
+            // Calculate normal speed based on level
+            normalSpeed = Math.max(100, 1000 - (level * 50));
+            
+            // If we are NOT holding the drop button, update current interval
+            if (!isFastDropping) {
+                dropInterval = normalSpeed;
+            }
         }
 
         function update(time = 0) {
@@ -504,34 +621,74 @@
             }
         }
 
+        // --- Logic for Fast Drop (Soft Drop) ---
+        function startFastDrop() {
+            if(isPaused || isGameOver) return;
+            isFastDropping = true;
+            dropInterval = fastSpeed;
+            document.getElementById('btn-drop').classList.add('active-state');
+        }
+
+        function stopFastDrop() {
+            isFastDropping = false;
+            dropInterval = normalSpeed;
+            document.getElementById('btn-drop').classList.remove('active-state');
+        }
+
         // --- Inputs ---
 
+        // Keyboard
         document.addEventListener('keydown', event => {
             if (isPaused) return;
             if (event.keyCode === 37) playerMove(-1);
             else if (event.keyCode === 39) playerMove(1);
-            else if (event.keyCode === 40) playerDrop();
+            else if (event.keyCode === 40) startFastDrop(); // Down arrow acts as soft drop
             else if (event.keyCode === 38) playerRotate(1);
-            else if (event.keyCode === 32) playerHardDrop();
-            else if (event.keyCode === 16 || event.keyCode === 67) playerHold(); // Shift or C
+            else if (event.keyCode === 16 || event.keyCode === 67) playerHold();
+        });
+        
+        document.addEventListener('keyup', event => {
+            if (event.keyCode === 40) stopFastDrop();
         });
 
-        function bindBtn(id, action) {
+        // Touch / Mouse Bindings
+        function bindBtn(id, action, holdAction = false) {
             const btn = document.getElementById(id);
-            ['mousedown', 'touchstart'].forEach(evt => 
-                btn.addEventListener(evt, (e) => {
-                    e.preventDefault();
-                    if (!isPaused && !isGameOver) action();
-                }, {passive: false})
-            );
+            
+            const handleStart = (e) => {
+                e.preventDefault();
+                if (!isPaused && !isGameOver) {
+                    if(holdAction) {
+                        startFastDrop();
+                    } else {
+                        action();
+                    }
+                }
+            };
+
+            const handleEnd = (e) => {
+                e.preventDefault(); // Prevent ghost mouse events
+                if(holdAction) stopFastDrop();
+            };
+
+            btn.addEventListener('mousedown', handleStart, {passive: false});
+            btn.addEventListener('touchstart', handleStart, {passive: false});
+
+            if (holdAction) {
+                btn.addEventListener('mouseup', handleEnd);
+                btn.addEventListener('mouseleave', handleEnd);
+                btn.addEventListener('touchend', handleEnd);
+            }
         }
 
         bindBtn('btn-left', () => playerMove(-1));
         bindBtn('btn-right', () => playerMove(1));
-        bindBtn('btn-down', () => playerDrop());
+        bindBtn('btn-down', () => playerDrop()); // Single step down
         bindBtn('btn-rotate', () => playerRotate(1));
-        bindBtn('btn-drop', () => playerHardDrop());
         bindBtn('btn-hold', () => playerHold());
+        
+        // Special binding for the big Drop Button (Gas Pedal Logic)
+        bindBtn('btn-drop', null, true);
 
         startBtn.addEventListener('click', () => {
             arena.forEach(row => row.fill(0));
@@ -542,6 +699,7 @@
             updateScore();
             isGameOver = false;
             isPaused = false;
+            isFastDropping = false;
             overlay.classList.add('hidden');
             playerReset();
             update();
