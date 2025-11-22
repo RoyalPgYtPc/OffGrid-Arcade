@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffGrid Arcade - Play Anywhere, Anytime</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.3); }
+            to { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.6); }
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #f0f0f0;
+        }
+
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .about-section {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 3rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .about-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-section p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .github-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #fff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: #fff;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 4rem;
+        }
+
+        .principles {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .principle {
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🎮 OffGrid Arcade</div>
+        <p class="tagline">Play Anywhere, Anytime — No Ads, No Tracking, No BS</p>
+        <a href="https://github.com/RoyalPgYtPc/OffGrid-Arcade" class="cta-button" target="_blank">Play Now</a>
+    </header>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🚫</div>
+            <h3>No Ads</h3>
+            <p>Pure gaming experience without interruptions or distractions. Just you and the game.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>No Tracking</h3>
+            <p>Your privacy matters. Play without being watched, tracked, or monetized.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <h3>Works Offline</h3>
+            <p>No constant connection needed. Download once and play anywhere, anytime.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast & Lightweight</h3>
+            <p>Browser-based HTML games that load instantly. No heavy downloads or installations.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Curated Quality</h3>
+            <p>Handpicked games that are actually fun to play. Quality over quantity, always.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3>Open Source</h3>
+            <p>Fully transparent on GitHub. Contributions welcome, licensing that protects the project.</p>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <h2>About OffGrid Arcade</h2>
+        <p>OffGrid Arcade is a curated hub for high-quality HTML games you can play anywhere. We believe gaming should be accessible, private, and distraction-free.</p>
+        <p>Built by gamers, for gamers. No corporate interference, no profit-driven dark patterns, just great games that respect your time and privacy.</p>
+        
+        <div class="principles">
+            <span class="principle">Open Source</span>
+            <span class="principle">Privacy First</span>
+            <span class="principle">Community Driven</span>
+        </div>
+
+        <a href="https://github.com/RoyalPgYtPc/OffGrid-Arcade" class="github-link" target="_blank">
+            View on GitHub →
+        </a>
+                <a href="Tetris/tetris.html" class="github-link" target="_blank">
+            View on GitHub →
+        </a>
+    </section>
+
+    <footer>
+        <p>OffGrid Arcade — Gaming Without Compromise</p>
+        <p style="opacity: 0.7; margin-top: 0.5rem;">Open source project | Licensed for protection and contribution</p>
+    </footer>
+</body>
+</html>
