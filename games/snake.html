@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake OffGrid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&family=Fredoka:wght@500&family=Orbitron:wght@500&family=Press+Start+2P&display=swap');
+
+        /* --- CSS Variables (Default: NEON) --- */
+        :root {
+            --bg-body: #0f0f1a;
+            --bg-canvas: rgba(0, 0, 0, 0.9);
+            --grid-line: rgba(255, 255, 255, 0.05);
+            --text-main: #fff;
+            --text-accent: #ff0055;
+            --ui-border: rgba(255, 255, 255, 0.15);
+            --btn-bg: rgba(255, 255, 255, 0.08);
+            --font-main: 'Chakra Petch', sans-serif;
+            --font-display: 'Chakra Petch', sans-serif;
+            
+            /* Game-specific colors */
+            --snake-head: #0DFF72;
+            --snake-body: #0DC2FF;
+            --food: #FF0D72;
+        }
+
+        /* --- Theme Overrides --- */
+        body.theme-vaporwave { --bg-body: #2b0f54; --bg-canvas: #1a0b2e; --grid-line: rgba(0,255,255,0.1); --text-main: #00f3ff; --text-accent: #ff00ff; --ui-border: #ff00ff; --font-main: 'Orbitron'; --font-display: 'Orbitron'; background: linear-gradient(180deg, #2b0f54, #ff0080); --snake-head: #05ffa1; --snake-body: #01cdfe; --food: #ff71ce; }
+        body.theme-gameboy { --bg-body: #8b9c48; --bg-canvas: #9bbc0f; --grid-line: rgba(15,56,15,0.15); --text-main: #0f380f; --text-accent: #306230; --ui-border: #306230; --btn-bg: rgba(15,56,15,0.1); --font-main: 'VT323'; --font-display: 'VT323'; --snake-head: #0f380f; --snake-body: #306230; --food: #0f380f; }
+        body.theme-matrix { --bg-body: #000; --bg-canvas: #000; --grid-line: #003300; --text-main: #00ff00; --text-accent: #00ff00; --ui-border: #004400; --btn-bg: #001100; --font-main: 'VT323'; --font-display: 'VT323'; --snake-head: #fff; --snake-body: #00ff00; --food: #00ff00; }
+        body.theme-candy { --bg-body: #fff0f5; --bg-canvas: #fff; --grid-line: #f0e6e6; --text-main: #555; --text-accent: #ff69b4; --ui-border: #ffb7b2; --btn-bg: rgba(255,183,178,0.2); --font-main: 'Fredoka'; --font-display: 'Fredoka'; --snake-head: #FF9AA2; --snake-body: #FFB7B2; --food: #B5EAD7; }
+        body.theme-blueprint { --bg-body: #004488; --bg-canvas: #003366; --grid-line: rgba(255,255,255,0.2); --text-main: #fff; --text-accent: #fff; --ui-border: #fff; --btn-bg: rgba(255,255,255,0.05); --font-main: 'Courier New'; --font-display: 'Courier New'; --snake-head: #fff; --snake-body: #fff; --food: #fff; }
+        body.theme-dracula { --bg-body: #282a36; --bg-canvas: #44475a; --grid-line: #6272a4; --text-main: #f8f8f2; --text-accent: #bd93f9; --ui-border: #6272a4; --btn-bg: rgba(98, 114, 164, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Chakra Petch'; --snake-head: #50fa7b; --snake-body: #8be9fd; --food: #ff79c6; }
+        body.theme-glitch { --bg-body: #110022; --bg-canvas: #000; --grid-line: #440099; --text-main: #00ffff; --text-accent: #ff00ff; --ui-border: #ff00ff; --btn-bg: rgba(255,0,255,0.1); --font-main: 'Press Start 2P'; --font-display: 'Press Start 2P'; --snake-head: #ffff00; --snake-body: #00ffff; --food: #ff00ff; }
+        body.theme-lava { --bg-body: #4a0000; --bg-canvas: #2e0000; --grid-line: #990000; --text-main: #ffbb00; --text-accent: #ff4500; --ui-border: #ff8c00; --btn-bg: rgba(255, 69, 0, 0.2); --font-main: 'Orbitron'; --font-display: 'Orbitron'; --snake-head: #fff; --snake-body: #ffbb00; --food: #ff4500; }
+        body.theme-8bit { --bg-body: #333333; --bg-canvas: #666666; --grid-line: #444444; --text-main: #ffffff; --text-accent: #ffff00; --ui-border: #ffff00; --btn-bg: rgba(255, 255, 0, 0.2); --font-main: 'Press Start 2P'; --font-display: 'Press Start 2P'; --snake-head: #fff; --snake-body: #00ff00; --food: #ff0000; }
+        body.theme-darkpro { --bg-body: #0a0a0a; --bg-canvas: #1c1c1c; --grid-line: rgba(255, 255, 255, 0.03); --text-main: #f0f0f0; --text-accent: #3b82f6; --ui-border: #3b82f6; --btn-bg: rgba(59, 130, 246, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Chakra Petch'; --snake-head: #fff; --snake-body: #3b82f6; --food: #10b981; }
+
+
+        /* --- Base Styles --- */
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow: hidden;
+            touch-action: none; 
+            height: 100dvh;
+            width: 100vw;
+            transition: background 0.4s ease, color 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .game-canvas {
+            image-rendering: pixelated;
+            background-color: var(--bg-canvas);
+            border: 2px solid var(--ui-border);
+            max-height: 100%;
+            max-width: 100%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            transition: border-color 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+            width: 90vw;
+            height: 90vw;
+            max-width: 400px;
+            max-height: 400px;
+        }
+        
+        #score, #overlay-title, #high-score, #level, .util-btn {
+            font-family: var(--font-display);
+        }
+
+        /* --- Controls --- */
+        .control-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--ui-border);
+            backdrop-filter: blur(4px);
+            transition: transform 0.05s, background 0.05s;
+            touch-action: manipulation;
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            width: 70px;
+            height: 70px;
+            font-size: 24px;
+        }
+        
+        .control-btn:active {
+            background: var(--text-accent);
+            color: var(--bg-body);
+            transform: scale(0.95);
+            border-color: var(--text-accent);
+        }
+
+        .d-pad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 226px; /* 70*3 + 8*2 */
+        }
+
+        .util-btn {
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border: 1px solid var(--ui-border);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--btn-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between p-2">
+
+    <!-- Top Bar -->
+    <div class="w-full max-w-lg flex justify-between items-center p-2 z-10">
+        <div class="flex flex-col items-start">
+            <div class="text-3xl font-bold tracking-widest" id="score">0</div>
+            <div class="text-[10px] opacity-60 font-mono">LEVEL <span id="level">1</span></div>
+        </div>
+        <div class="flex gap-2">
+            <button id="theme-btn" class="util-btn">THEME: NEON</button>
+            <!-- Music button can be added later -->
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-2">
+        <canvas id="game-canvas" width="400" height="400" class="game-canvas rounded-lg"></canvas>
+        
+        <!-- Overlay -->
+        <div id="overlay" class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center p-4">
+            <div class="bg-black/80 backdrop-blur-md p-8 rounded-lg border-2 border-[var(--ui-border)]">
+                <h2 id="overlay-title" class="text-5xl font-bold mb-2 tracking-tighter text-[var(--text-accent)] drop-shadow-lg">SNAKE</h2>
+                <div class="text-xs opacity-70 mb-8 font-mono">HIGH SCORE: <span id="high-score">0</span></div>
+                
+                <button id="start-btn" class="px-8 py-4 bg-[var(--text-accent)] text-[var(--bg-body)] font-bold text-xl rounded shadow-lg active:scale-95 transition-transform border border-white/20 mb-4 cursor-pointer z-50">
+                    START GAME
+                </button>
+                
+                <div class="flex flex-col gap-1 text-[10px] text-gray-400 mt-2">
+                    <p>Use D-Pad or Arrow Keys to move</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="w-full max-w-lg flex items-center justify-center p-4 select-none z-10">
+        <div class="d-pad-grid">
+            <div class="h-14"></div>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-up"><i class="fas fa-chevron-up"></i></button>
+            <div class="h-14"></div>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-left"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-down"><i class="fas fa-chevron-down"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Theme Engine ---
+        const THEMES = [
+            { name: 'NEON', id: '' },
+            { name: 'VAPOR', id: 'theme-vaporwave' },
+            { name: 'GAMEBOY', id: 'theme-gameboy' },
+            { name: 'MATRIX', id: 'theme-matrix' },
+            { name: 'CANDY', id: 'theme-candy' },
+            { name: 'PRINT', id: 'theme-blueprint' },
+            { name: 'DRACULA', id: 'theme-dracula' },
+            { name: 'GLITCH', id: 'theme-glitch' },
+            { name: 'LAVA', id: 'theme-lava' },
+            { name: '8-BIT', id: 'theme-8bit' },
+            { name: 'DARKPRO', id: 'theme-darkpro' }
+        ];
+
+        let themeIndex = 0;
+        let currentTheme = THEMES[0];
+
+        // --- 2. Game Logic ---
+        const canvas = document.getElementById('game-canvas');
+        const context = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const highScoreEl = document.getElementById('high-score');
+
+        const GRID_SIZE = 20; // 20x20 grid
+        let tileSize = canvas.width / GRID_SIZE;
+
+        let snake, food, direction, score, level, highScore, gameSpeed, isPaused, isGameOver, gameLoopTimeout;
+
+        highScore = localStorage.getItem('snake_hs') || 0;
+        highScoreEl.innerText = highScore;
+
+        function getThemeColor(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName);
+        }
+
+        function initGame() {
+            snake = [{ x: 10, y: 10 }]; // Start in the middle
+            food = {};
+            placeFood();
+            direction = { x: 0, y: 0 };
+            score = 0;
+            level = 1;
+            gameSpeed = 150; // ms per frame
+            isPaused = true;
+            isGameOver = false;
+
+            scoreEl.innerText = score;
+            levelEl.innerText = level;
+            
+            overlay.style.display = 'flex';
+            document.getElementById('overlay-title').innerText = "SNAKE";
+            startBtn.innerText = "START GAME";
+
+            drawGame(); // Draw initial state
+        }
+
+        function startGame() {
+            initGame(); // Reset everything
+            isPaused = false;
+            direction = { x: 0, y: -1 }; // Start moving up
+            overlay.style.display = 'none';
+            gameLoop();
+        }
+
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * GRID_SIZE),
+                y: Math.floor(Math.random() * GRID_SIZE)
+            };
+            // Check if food is on snake, if so, replace it
+            for (const segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    placeFood();
+                    break;
+                }
+            }
+        }
+
+        function gameLoop() {
+            if (isPaused || isGameOver) return;
+
+            updateGame();
+            drawGame();
+
+            clearTimeout(gameLoopTimeout); // Clear previous timeout
+            gameLoopTimeout = setTimeout(gameLoop, gameSpeed);
+        }
+
+        function updateGame() {
+            if (isGameOver) return;
+
+            // Calculate new head position
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            // Check for wall collision
+            if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
+                setGameOver();
+                return;
+            }
+
+            // Check for self-collision
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    setGameOver();
+                    return;
+                }
+            }
+
+            // Add new head
+            snake.unshift(head);
+
+            // Check for food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreEl.innerText = score;
+                placeFood();
+                
+                // Increase level and speed
+                if (score % 50 === 0) {
+                    level++;
+                    levelEl.innerText = level;
+                    gameSpeed = Math.max(50, gameSpeed - 10); // Speed up, with a max speed
+                }
+            } else {
+                // Remove tail
+                snake.pop();
+            }
+        }
+
+        function drawGame() {
+            // Clear canvas
+            context.fillStyle = getThemeColor('--bg-canvas');
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            const gridColor = getThemeColor('--grid-line');
+            context.strokeStyle = gridColor;
+            context.lineWidth = 1;
+            for (let x = 0; x <= canvas.width; x += tileSize) {
+                context.beginPath();
+                context.moveTo(x, 0);
+                context.lineTo(x, canvas.height);
+                context.stroke();
+            }
+            for (let y = 0; y <= canvas.height; y += tileSize) {
+                context.beginPath();
+                context.moveTo(0, y);
+                context.lineTo(canvas.width, y);
+                context.stroke();
+            }
+
+            // Draw food
+            context.fillStyle = getThemeColor('--food');
+            context.fillRect(food.x * tileSize, food.y * tileSize, tileSize, tileSize);
+            // Add a little highlight to food
+            context.fillStyle = 'rgba(255,255,255,0.3)';
+            context.fillRect(food.x * tileSize + 2, food.y * tileSize + 2, tileSize - 4, tileSize - 4);
+
+
+            // Draw snake
+            const headColor = getThemeColor('--snake-head');
+            const bodyColor = getThemeColor('--snake-body');
+            
+            snake.forEach((segment, index) => {
+                context.fillStyle = (index === 0) ? headColor : bodyColor;
+                context.fillRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+                
+                // Add border for themes like 8-bit
+                if (currentTheme.name === '8-BIT') {
+                    context.strokeStyle = '#333';
+                    context.strokeRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+                } else if (currentTheme.name === 'GAMEBOY') {
+                    context.strokeStyle = getThemeColor('--bg-canvas');
+                    context.strokeRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+                }
+            });
+        }
+
+        function setGameOver() {
+            isGameOver = true;
+            isPaused = true;
+            clearTimeout(gameLoopTimeout);
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snake_hs', highScore);
+                highScoreEl.innerText = highScore;
+            }
+
+            overlay.style.display = 'flex';
+            document.getElementById('overlay-title').innerText = "GAME OVER";
+            startBtn.innerText = "RESTART";
+        }
+
+        function changeDirection(dx, dy) {
+            if (isPaused || isGameOver) return;
+            // Prevent 180-degree turns
+            if (snake.length > 1 && direction.x === -dx && direction.y === -dy) {
+                return;
+            }
+            direction = { x: dx, y: dy };
+        }
+
+        // --- 3. Input & Interaction ---
+        
+        // Theme Button
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            if(currentTheme.id) document.body.classList.remove(currentTheme.id);
+            themeIndex = (themeIndex + 1) % THEMES.length;
+            currentTheme = THEMES[themeIndex];
+            if(currentTheme.id) document.body.classList.add(currentTheme.id);
+            document.getElementById('theme-btn').innerText = `THEME: ${currentTheme.name}`;
+            
+            // Redraw game with new theme colors
+            if(isPaused) drawGame(); 
+        });
+
+        // Start Button
+        startBtn.addEventListener('click', startGame);
+
+        // Mobile Controls
+        document.getElementById('btn-up').addEventListener('click', () => changeDirection(0, -1));
+        document.getElementById('btn-down').addEventListener('click', () => changeDirection(0, 1));
+        document.getElementById('btn-left').addEventListener('click', () => changeDirection(-1, 0));
+        document.getElementById('btn-right').addEventListener('click', () => changeDirection(1, 0));
+
+        // Keyboard Controls
+        document.addEventListener('keydown', e => {
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'w':
+                    changeDirection(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    changeDirection(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                    changeDirection(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    changeDirection(1, 0);
+                    break;
+                case 'Enter':
+                case ' ':
+                    if (isGameOver || isPaused) {
+                        startGame();
+                    }
+                    break;
+            }
+        });
+
+        // Handle window resize
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth, container.clientHeight, 400);
+            
+            // Make size a multiple of GRID_SIZE
+            const newSize = Math.floor(size / GRID_SIZE) * GRID_SIZE;
+
+            canvas.width = newSize;
+            canvas.height = newSize;
+            canvas.style.width = `${newSize}px`;
+            canvas.style.height = `${newSize}px`;
+
+            tileSize = canvas.width / GRID_SIZE;
+            
+            drawGame(); // Redraw on resize
+        }
+
+        // Window resize listener
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        initGame(); // Initialize variables first
+        resizeCanvas(); // Then resize and draw
+
+    </script>
+</body>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Breakout With Themes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&family=Fredoka:wght@500&family=Orbitron:wght@500&family=Press+Start+2P&display=swap');
+
+        /* --- CSS Variables (Default: NEON) --- */
+        :root {
+            --bg-body: #0f0f1a;
+            --bg-canvas: rgba(0, 0, 0, 0.9);
+            --text-main: #fff;
+            --text-accent: #ff0055;
+            --ui-border: rgba(255, 255, 255, 0.15);
+            --btn-bg: rgba(255, 255, 255, 0.08);
+            --font-main: 'Chakra Petch', sans-serif;
+            --font-display: 'Chakra Petch', sans-serif;
+            
+            /* Game-specific colors */
+            --paddle-color: var(--text-accent);
+            --ball-color: #ffffff;
+            --brick-1: #0DC2FF;
+            --brick-2: #0DFF72;
+            --brick-3: #F538FF;
+            --brick-4: #FF8E0D;
+            --brick-5: #FFE138;
+        }
+
+        /* --- Theme Overrides --- */
+        body.theme-vaporwave { --bg-body: #2b0f54; --bg-canvas: #1a0b2e; --text-main: #00f3ff; --text-accent: #ff00ff; --ui-border: #ff00ff; --font-main: 'Orbitron'; --font-display: 'Orbitron'; background: linear-gradient(180deg, #2b0f54, #ff0080); --paddle-color: var(--text-accent); --ball-color: #fff; --brick-1: #01cdfe; --brick-2: #05ffa1; --brick-3: #b967ff; --brick-4: #fffb96; --brick-5: #ff71ce; }
+        body.theme-gameboy { --bg-body: #8b9c48; --bg-canvas: #9bbc0f; --text-main: #0f380f; --text-accent: #306230; --ui-border: #306230; --btn-bg: rgba(15,56,15,0.1); --font-main: 'VT323'; --font-display: 'VT323'; --paddle-color: #0f380f; --ball-color: #0f380f; --brick-1: #0f380f; --brick-2: #306230; --brick-3: #0f380f; --brick-4: #306230; --brick-5: #0f380f; }
+        body.theme-matrix { --bg-body: #000; --bg-canvas: #000; --text-main: #00ff00; --text-accent: #00ff00; --ui-border: #004400; --btn-bg: #001100; --font-main: 'VT323'; --font-display: 'VT323'; --paddle-color: #0f0; --ball-color: #fff; --brick-1: #00ff00; --brick-2: #00dd00; --brick-3: #00bb00; --brick-4: #009900; --brick-5: #007700; }
+        body.theme-candy { --bg-body: #fff0f5; --bg-canvas: #fff; --text-main: #555; --text-accent: #ff69b4; --ui-border: #ffb7b2; --btn-bg: rgba(255,183,178,0.2); --font-main: 'Fredoka'; --font-display: 'Fredoka'; --paddle-color: #ff69b4; --ball-color: #555; --brick-1: #FF9AA2; --brick-2: #FFB7B2; --brick-3: #FFDAC1; --brick-4: #E2F0CB; --brick-5: #B5EAD7; }
+        body.theme-blueprint { --bg-body: #004488; --bg-canvas: #003366; --text-main: #fff; --text-accent: #fff; --ui-border: #fff; --btn-bg: rgba(255,255,255,0.05); --font-main: 'Courier New'; --font-display: 'Courier New'; --paddle-color: #fff; --ball-color: #fff; --brick-1: #fff; --brick-2: #fff; --brick-3: #fff; --brick-4: #fff; --brick-5: #fff; }
+        body.theme-dracula { --bg-body: #282a36; --bg-canvas: #44475a; --text-main: #f8f8f2; --text-accent: #bd93f9; --ui-border: #6272a4; --btn-bg: rgba(98, 114, 164, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Chakra Petch'; --paddle-color: #bd93f9; --ball-color: #f8f8f2; --brick-1: #ff79c6; --brick-2: #50fa7b; --brick-3: #8be9fd; --brick-4: #ffb86c; --brick-5: #f1fa8c; }
+        body.theme-glitch { --bg-body: #110022; --bg-canvas: #000; --text-main: #00ffff; --text-accent: #ff00ff; --ui-border: #ff00ff; --btn-bg: rgba(255,0,255,0.1); --font-main: 'Press Start 2P'; --font-display: 'Press Start 2P'; --paddle-color: #00ffff; --ball-color: #ffff00; --brick-1: #ff00ff; --brick-2: #00ffff; --brick-3: #9d00ff; --brick-4: #ff0077; --brick-5: #00ff77; }
+        body.theme-lava { --bg-body: #4a0000; --bg-canvas: #2e0000; --text-main: #ffbb00; --text-accent: #ff4500; --ui-border: #ff8c00; --btn-bg: rgba(255, 69, 0, 0.2); --font-main: 'Orbitron'; --font-display: 'Orbitron'; --paddle-color: #ff4500; --ball-color: #fff; --brick-1: #ff0000; --brick-2: #ff4500; --brick-3: #ff8c00; --brick-4: #ffbb00; --brick-5: #990000; }
+        body.theme-8bit { --bg-body: #333333; --bg-canvas: #666666; --text-main: #ffffff; --text-accent: #ffff00; --ui-border: #ffff00; --btn-bg: rgba(255, 255, 0, 0.2); --font-main: 'Press Start 2P'; --font-display: 'Press Start 2P'; --paddle-color: #ffff00; --ball-color: #fff; --brick-1: #ff0000; --brick-2: #0000ff; --brick-3: #00ff00; --brick-4: #ffff00; --brick-5: #ff00ff; }
+        body.theme-darkpro { --bg-body: #0a0a0a; --bg-canvas: #1c1c1c; --text-main: #f0f0f0; --text-accent: #3b82f6; --ui-border: #3b82f6; --btn-bg: rgba(59, 130, 246, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Chakra Petch'; --paddle-color: #3b82f6; --ball-color: #fff; --brick-1: #10b981; --brick-2: #f59e0b; --brick-3: #ef4444; --brick-4: #8b5cf6; --brick-5: #a3a3a3; }
+
+
+        /* --- Base Styles --- */
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow: hidden;
+            touch-action: none; 
+            height: 100dvh;
+            width: 100vw;
+            transition: background 0.4s ease, color 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between; /* Changed from center to space-between */
+            padding: 8px;
+        }
+
+        .game-canvas {
+            image-rendering: pixelated;
+            background-color: var(--bg-canvas);
+            border: 2px solid var(--ui-border);
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            transition: border-color 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+            cursor: none;
+            flex-shrink: 1;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 2 / 3;
+        }
+        
+        #score, #overlay-title, #high-score, #level, .util-btn, #lives {
+            font-family: var(--font-display);
+        }
+
+        .util-btn {
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border: 1px solid var(--ui-border);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--btn-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        /* --- Controls --- */
+        .control-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--ui-border);
+            backdrop-filter: blur(4px);
+            transition: transform 0.05s, background 0.05s;
+            touch-action: manipulation;
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            width: 90px;
+            height: 70px;
+            font-size: 24px;
+        }
+        
+        .control-btn:active, .control-btn.active-state { /* Added active-state for mouse users */
+            background: var(--text-accent);
+            color: var(--bg-body);
+            transform: scale(0.95);
+            border-color: var(--text-accent);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between p-2"> <!-- Changed justify-center to justify-between -->
+
+    <!-- Top Bar -->
+    <div class="w-full max-w-lg flex justify-between items-center p-2 z-10">
+        <div class="flex flex-col items-start">
+            <div class="text-3xl font-bold tracking-widest" id="score">0</div>
+            <div class="text-[10px] opacity-60 font-mono">HIGH: <span id="high-score">0</span></div>
+        </div>
+        <div class="text-3xl font-bold tracking-widest" id="lives">
+            <i class="fas fa-heart"></i> <i class="fas fa-heart"></i> <i class="fas fa-heart"></i>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+            <button id="theme-btn" class="util-btn">THEME: NEON</button>
+            <div class="text-xl font-bold tracking-widest opacity-80">L: <span id="level">1</span></div>
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-2">
+        <canvas id="game-canvas" width="400" height="600" class="game-canvas rounded-lg"></canvas>
+        
+        <!-- Overlay -->
+        <div id="overlay" class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center p-4">
+            <div class="bg-black/80 backdrop-blur-md p-8 rounded-lg border-2 border-[var(--ui-border)]">
+                <h2 id="overlay-title" class="text-5xl font-bold mb-2 tracking-tighter text-[var(--text-accent)] drop-shadow-lg">BREAKOUT</h2>
+                <div class="text-xs opacity-70 mb-8 font-mono">HIGH SCORE: <span id="high-score-overlay">0</span></div>
+                
+                <button id="start-btn" class="px-8 py-4 bg-[var(--text-accent)] text-[var(--bg-body)] font-bold text-xl rounded shadow-lg active:scale-95 transition-transform border border-white/20 mb-4 cursor-pointer z-50">
+                    START GAME
+                </button>
+                
+                <div class="flex flex-col gap-1 text-[10px] text-gray-400 mt-2">
+                    <p>Move mouse/finger or use Arrow Keys</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls are handled by mouse/touch on canvas -->
+    <!-- Controls -->
+    <div class="w-full max-w-lg flex items-center justify-center p-4 select-none z-10">
+        <div class="flex gap-4">
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-left"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Theme Engine ---
+        const THEMES = [
+            { name: 'NEON', id: '' },
+            { name: 'VAPOR', id: 'theme-vaporwave' },
+            { name: 'GAMEBOY', id: 'theme-gameboy' },
+            { name: 'MATRIX', id: 'theme-matrix' },
+            { name: 'CANDY', id: 'theme-candy' },
+            { name: 'PRINT', id: 'theme-blueprint' },
+            { name: 'DRACULA', id: 'theme-dracula' },
+            { name: 'GLITCH', id: 'theme-glitch' },
+            { name: 'LAVA', id: 'theme-lava' },
+            { name: '8-BIT', id: 'theme-8bit' },
+            { name: 'DARKPRO', id: 'theme-darkpro' }
+        ];
+
+        let themeIndex = 0;
+        let currentTheme = THEMES[0];
+
+        // --- 2. Game Logic ---
+        const canvas = document.getElementById('game-canvas');
+        const context = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const livesEl = document.getElementById('lives');
+        const highScoreEl = document.getElementById('high-score');
+        const highScoreOverlayEl = document.getElementById('high-score-overlay');
+
+        let score, lives, level, highScore, isPaused, isGameOver;
+        let ball, paddle, bricks, brickRowCount, brickColCount;
+
+        // Game constants
+        const PADDLE_HEIGHT = 10;
+        const PADDLE_WIDTH = 80;
+        const BALL_RADIUS = 8;
+
+        highScore = localStorage.getItem('breakout_hs') || 0;
+        highScoreEl.innerText = highScore;
+        highScoreOverlayEl.innerText = highScore;
+
+        function getThemeColor(varName) {
+            // --- THIS IS THE FIX ---
+            // We now read from document.body, not document.documentElement
+            return getComputedStyle(document.body).getPropertyValue(varName);
+        }
+
+        function updateLivesDisplay() {
+            let hearts = '';
+            for(let i = 0; i < 3; i++) {
+                hearts += `<i class="fas fa-heart ${i < lives ? '' : 'opacity-20'}"></i> `;
+            }
+            livesEl.innerHTML = hearts;
+        }
+
+        function createBricks() {
+            bricks = [];
+            brickRowCount = 8;
+            brickColCount = 6;
+            const brickWidth = 55;
+            const brickHeight = 15;
+            const brickPadding = 5;
+            const brickOffsetTop = 30;
+            const brickOffsetLeft = (canvas.width - (brickColCount * (brickWidth + brickPadding)) + brickPadding) / 2;
+            
+            const brickColors = [
+                getThemeColor('--brick-1'),
+                getThemeColor('--brick-2'),
+                getThemeColor('--brick-3'),
+                getThemeColor('--brick-4'),
+                getThemeColor('--brick-5'),
+            ];
+
+            for (let c = 0; c < brickColCount; c++) {
+                bricks[c] = [];
+                for (let r = 0; r < brickRowCount; r++) {
+                    const x = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
+                    const y = (r * (brickHeight + brickPadding)) + brickOffsetTop;
+                    bricks[c][r] = { x, y, width: brickWidth, height: brickHeight, status: 1, color: brickColors[r % brickColors.length] };
+                }
+            }
+        }
+        
+        function resetBallAndPaddle() {
+            ball = {
+                x: canvas.width / 2,
+                y: canvas.height - 50,
+                dx: (Math.random() - 0.5) * 4, // Randomize initial x direction
+                dy: -3 - (level * 0.5), // Base speed + level bonus
+                radius: BALL_RADIUS,
+                speed: 3 + (level * 0.5)
+            };
+            paddle = {
+                x: (canvas.width - PADDLE_WIDTH) / 2,
+                width: PADDLE_WIDTH,
+                height: PADDLE_HEIGHT
+            };
+        }
+
+        function initGame() {
+            score = 0;
+            lives = 3;
+            level = 1;
+            isPaused = true;
+            isGameOver = false;
+
+            scoreEl.innerText = score;
+            levelEl.innerText = level;
+            updateLivesDisplay();
+            
+            resetBallAndPaddle();
+            createBricks();
+
+            overlay.style.display = 'flex';
+            document.getElementById('overlay-title').innerText = "BREAKOUT";
+            startBtn.innerText = "START GAME";
+
+            drawGame(); // Draw initial state
+        }
+
+        function startGame() {
+            initGame(); // Reset everything
+            isPaused = false;
+            overlay.style.display = 'none';
+            gameLoop();
+        }
+
+        function drawBall() {
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = getThemeColor('--ball-color');
+            context.fill();
+            context.closePath();
+        }
+
+        function drawPaddle() {
+            context.beginPath();
+            context.rect(paddle.x, canvas.height - paddle.height, paddle.width, paddle.height);
+            context.fillStyle = getThemeColor('--paddle-color');
+            context.fill();
+            context.closePath();
+        }
+
+        function drawBricks() {
+            for (let c = 0; c < brickColCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status === 1) {
+                        const brick = bricks[c][r];
+                        context.beginPath();
+                        context.rect(brick.x, brick.y, brick.width, brick.height);
+                        context.fillStyle = brick.color;
+                        context.fill();
+                        context.closePath();
+                        
+                        // Add highlights based on theme
+                        if (currentTheme.name === 'GAMEBOY') {
+                            context.strokeStyle = getThemeColor('--bg-canvas');
+                            context.lineWidth = 2;
+                            context.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                        } else if (currentTheme.name === '8-BIT') {
+                            context.strokeStyle = '#333';
+                            context.lineWidth = 1;
+                            context.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                        } else if (currentTheme.name === 'PRINT') {
+                             context.strokeStyle = getThemeColor('--ui-border');
+                            context.lineWidth = 1;
+                            context.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                        }
+                    }
+                }
+            }
+        }
+        
+        function drawGame() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = getThemeColor('--bg-canvas');
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawBricks();
+            drawBall();
+            drawPaddle();
+        }
+
+        function updateGame() {
+            if (isPaused || isGameOver) return;
+
+            // Move ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Wall collision (left/right)
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                ball.dx = -ball.dx;
+            }
+
+            // Wall collision (top)
+            if (ball.y - ball.radius < 0) {
+                ball.dy = -ball.dy;
+            }
+
+            // Wall collision (bottom) - Lose life
+            if (ball.y + ball.radius > canvas.height) {
+                lives--;
+                updateLivesDisplay();
+                if (lives === 0) {
+                    setGameOver();
+                } else {
+                    isPaused = true; // Pause briefly
+                    resetBallAndPaddle();
+                    setTimeout(() => isPaused = false, 1000); // Resume after 1 sec
+                }
+                return;
+            }
+
+            // Paddle collision
+            if (ball.x > paddle.x && ball.x < paddle.x + paddle.width &&
+                ball.y + ball.radius > canvas.height - paddle.height) {
+                
+                // Change angle based on hit location
+                let collidePoint = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+                let angle = collidePoint * (Math.PI / 3); // Max 60-degree angle
+                
+                ball.dx = ball.speed * Math.sin(angle);
+                ball.dy = -ball.speed * Math.cos(angle);
+            }
+
+            // Brick collision
+            let allBricksBroken = true;
+            for (let c = 0; c < brickColCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    const b = bricks[c][r];
+                    if (b.status === 1) {
+                        allBricksBroken = false;
+                        if (ball.x > b.x && ball.x < b.x + b.width &&
+                            ball.y > b.y && ball.y < b.y + b.height) {
+                            
+                            ball.dy = -ball.dy;
+                            b.status = 0;
+                            score += 10;
+                            scoreEl.innerText = score;
+                        }
+                    }
+                }
+            }
+
+            // Next level
+            if (allBricksBroken) {
+                level++;
+                levelEl.innerText = level;
+                isPaused = true;
+                createBricks();
+                resetBallAndPaddle();
+                setTimeout(() => isPaused = false, 1000);
+            }
+        }
+        
+        function gameLoop() {
+            if (isGameOver) return;
+            
+            updateGame();
+            drawGame();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function setGameOver() {
+            isGameOver = true;
+            isPaused = true;
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('breakout_hs', highScore);
+                highScoreEl.innerText = highScore;
+                highScoreOverlayEl.innerText = highScore;
+            }
+
+            overlay.style.display = 'flex';
+            document.getElementById('overlay-title').innerText = "GAME OVER";
+            startBtn.innerText = "RESTART";
+        }
+
+        // --- 3. Input & Interaction ---
+        
+        // Theme Button
+        document.getElementById('theme-btn').addEventListener('click', () => {
+            // 1. Change the class immediately. This part is fine.
+            if(currentTheme.id) document.body.classList.remove(currentTheme.id);
+            themeIndex = (themeIndex + 1) % THEMES.length;
+            currentTheme = THEMES[themeIndex];
+            if(currentTheme.id) document.body.classList.add(currentTheme.id);
+            document.getElementById('theme-btn').innerText = `THEME: ${currentTheme.name}`;
+            
+            // 2. Schedule the color update and redraw for the *next* animation frame.
+            // This gives the browser time to update its computed styles.
+            requestAnimationFrame(() => {
+                // 3. NOW, it's safe to get the new colors.
+                const newBrickColors = [
+                    getThemeColor('--brick-1'),
+                    getThemeColor('--brick-2'),
+                    getThemeColor('--brick-3'),
+                    getThemeColor('--brick-4'),
+                    getThemeColor('--brick-5'),
+                ];
+
+                // 4. Update the brick data structure
+                if (bricks && bricks.length > 0) { // Check if bricks array is initialized
+                    for (let c = 0; c < brickColCount; c++) {
+                        for (let r = 0; r < brickRowCount; r++) {
+                            if (bricks[c] && bricks[c][r]) { // Check if brick exists
+                                // Re-assign color based on row index, just like in createBricks
+                                bricks[c][r].color = newBrickColors[r % newBrickColors.length];
+                            }
+                        }
+                    }
+                }
+                
+                // 5. NOW, redraw the game. This will correctly use the new colors
+                // for the paddle, ball, AND the newly-updated bricks.
+                drawGame();
+            });
+            
+            // We remove the old drawGame() call from here, as it was running too early.
+        });
+
+        // Start Button
+        startBtn.addEventListener('click', startGame);
+
+        // Mouse Controls
+        document.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            let root = document.documentElement;
+            let relativeX = e.clientX - rect.left - (root.scrollLeft || 0);
+            
+            if (relativeX > 0 && relativeX < canvas.width) {
+                paddle.x = relativeX - paddle.width / 2;
+                // Constrain paddle
+                if (paddle.x < 0) paddle.x = 0;
+                if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+            }
+        });
+
+        // Touch Controls
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            let root = document.documentElement;
+            let relativeX = e.touches[0].clientX - rect.left - (root.scrollLeft || 0);
+            
+            if (relativeX > 0 && relativeX < canvas.width) {
+                paddle.x = relativeX - paddle.width / 2;
+                // Constrain paddle
+                if (paddle.x < 0) paddle.x = 0;
+                if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+            }
+        }, { passive: false });
+
+        // Keyboard Controls
+        let rightPressed = false;
+        let leftPressed = false;
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd') {
+                rightPressed = true;
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key === 'a') {
+                leftPressed = true;
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                 if (isGameOver || isPaused) {
+                    startGame();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', e => {
+            if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd') {
+                rightPressed = false;
+            } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key === 'a') {
+                leftPressed = false;
+            }
+        });
+        
+        // Mobile Button Controls
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+
+        const startPress = (e, direction) => {
+            e.preventDefault();
+            if (direction === 'left') leftPressed = true;
+            if (direction === 'right') rightPressed = true;
+            e.currentTarget.classList.add('active-state');
+        };
+
+        const endPress = (e, direction) => {
+            e.preventDefault();
+            if (direction === 'left') leftPressed = false;
+            if (direction === 'right') rightPressed = false;
+            e.currentTarget.classList.remove('active-state');
+        };
+
+        // Left Button
+        btnLeft.addEventListener('touchstart', (e) => startPress(e, 'left'), { passive: false });
+        btnLeft.addEventListener('touchend', (e) => endPress(e, 'left'));
+        btnLeft.addEventListener('touchcancel', (e) => endPress(e, 'left'));
+        btnLeft.addEventListener('mousedown', (e) => startPress(e, 'left'));
+        btnLeft.addEventListener('mouseup', (e) => endPress(e, 'left'));
+        btnLeft.addEventListener('mouseleave', (e) => endPress(e, 'left'));
+
+        // Right Button
+        btnRight.addEventListener('touchstart', (e) => startPress(e, 'right'), { passive: false });
+        btnRight.addEventListener('touchend', (e) => endPress(e, 'right'));
+        btnRight.addEventListener('touchcancel', (e) => endPress(e, 'right'));
+        btnRight.addEventListener('mousedown', (e) => startPress(e, 'right'));
+        btnRight.addEventListener('mouseup', (e) => endPress(e, 'right'));
+        btnRight.addEventListener('mouseleave', (e) => endPress(e, 'right'));
+
+
+        // Keyboard paddle movement in game loop
+        function updatePaddleFromKeyboard() {
+            if (rightPressed && paddle.x < canvas.width - paddle.width) {
+                paddle.x += 7;
+            } else if (leftPressed && paddle.x > 0) {
+                paddle.x -= 7;
+            }
+        }
+        
+        // Modify gameLoop to include keyboard check
+        function gameLoop() {
+            if (isGameOver) return;
+            
+            if (!isPaused) {
+                updatePaddleFromKeyboard(); // Check for keyboard input
+                updateGame();
+            }
+            drawGame();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Handle window resize
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            // Calculate height based on aspect ratio 2:3
+            const newWidth = Math.min(container.clientWidth - 16, 400); // Use max-width 400
+            const newHeight = newWidth * 1.5; // 3/2 aspect ratio
+
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            canvas.style.width = `${newWidth}px`;
+            canvas.style.height = `${newHeight}px`;
+            
+            // Re-initialize game elements on resize
+            if(!isPaused) {
+                // If game is running, just reset, else draw
+                resetBallAndPaddle();
+                createBricks();
+            }
+            drawGame();
+        }
+
+        // Window resize listener
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        resizeCanvas(); // Set initial size
+        initGame(); // Initialize variables
+
+    </script>
+</body>
+</html>
