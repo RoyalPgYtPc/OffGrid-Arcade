@@ -16,11 +16,11 @@
 
 **Currently available**
 - Tetris
-
-**Coming next**
 - Snake
 - Breakout
 - 2048
+**Coming next**
+
 - Minesweeper
 - Asteroids
 - Flappy-style runner
