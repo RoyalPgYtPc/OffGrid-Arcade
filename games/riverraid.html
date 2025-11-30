@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Riverraid Recreated v4</title>a
+    <title>Riverraid Recreated v5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Import Tone.js for audio -->
@@ -26,6 +26,7 @@
             --player-color: #0DFF72;
             --player-accent: #FFFFFF; /* Cockpit */
             --bullet-color: #FFE138;
+            --missile-color: var(--player-accent);
             --enemy-ship-color: #FF8E0D;
             --enemy-ship-accent: #D97706; /* Ship cabin */
             --enemy-heli-color: #F538FF;
@@ -41,11 +42,11 @@
         }
 
         /* --- Theme Overrides --- */
-        body.theme-vaporwave { --bg-body: #2b0f54; --text-main: #00f3ff; --text-accent: #ff00ff; --ui-border: #ff00ff; --font-main: 'Orbitron'; --font-display: 'Orbitron'; background: linear-gradient(180deg, #2b0f54, #ff0080); --bg-canvas: #1a0b2e; --player-color: #05ffa1; --player-accent: #fff; --bullet-color: #fffb96; --enemy-ship-color: #ff71ce; --enemy-ship-accent: #F472B6; --enemy-heli-color: #b967ff; --enemy-heli-accent: #D946EF; --enemy-bullet-color: #ff71ce; --fuel-depot-color: #05ffa1; --fuel-bar-fill: #05ffa1; --bridge-color: #4b2370; --radar-bg: rgba(0, 0, 0, 0.3); --radar-border: #ff00ff; --radar-sweep: rgba(5, 255, 161, 0.3); }
-        body.theme-gameboy { --bg-body: #8b9c48; --text-main: #0f380f; --text-accent: #306230; --ui-border: #306230; --btn-bg: rgba(15,56,15,0.1); --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #9bbc0f; --player-color: #0f380f; --player-accent: #306230; --bullet-color: #0f380f; --enemy-ship-color: #306230; --enemy-ship-accent: #0f380f; --enemy-heli-color: #0f380f; --enemy-heli-accent: #306230; --enemy-bullet-color: #0f380f; --fuel-depot-color: #306230; --fuel-bar-fill: #0f380f; --bridge-color: #8bac0f; --radar-bg: rgba(15, 56, 15, 0.2); --radar-border: #0f380f; --radar-sweep: rgba(15, 56, 15, 0.3); }
-        body.theme-matrix { --bg-body: #000; --text-main: #00ff00; --text-accent: #00ff00; --ui-border: #004400; --btn-bg: #001100; --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #001100; --player-color: #fff; --player-accent: #00ff00; --bullet-color: #fff; --enemy-ship-color: #00ff00; --enemy-ship-accent: #00bb00; --enemy-heli-color: #00bb00; --enemy-heli-accent: #00ff00; --enemy-bullet-color: #fff; --fuel-depot-color: #fff; --fuel-bar-fill: #00ff00; --bridge-color: #004400; --radar-bg: rgba(0, 20, 0, 0.3); --radar-border: #00ff00; --radar-sweep: rgba(0, 255, 0, 0.3); }
-        body.theme-candy { --bg-body: #fff0f5; --text-main: #555; --text-accent: #ff69b4; --ui-border: #ffb7b2; --btn-bg: rgba(255,183,178,0.2); --font-main: 'Fredoka'; --font-display: 'Fredoka'; --bg-canvas: #B5EAD7; --player-color: #ff69b4; --player-accent: #fff; --bullet-color: #FF9AA2; --enemy-ship-color: #FFB7B2; --enemy-ship-accent: #FF9AA2; --enemy-heli-color: #C7CEEA; --enemy-heli-accent: #A3A3A3; --enemy-bullet-color: #FF9AA2; --fuel-depot-color: #E2F0CB; --fuel-bar-fill: #E2F0CB; --bridge-color: #FFDAC1; --radar-bg: rgba(255, 255, 255, 0.3); --radar-border: #ffb7b2; --radar-sweep: rgba(255, 105, 180, 0.3); }
-        body.theme-darkpro { --bg-body: #0a0a0a; --text-main: #f0f0f0; --text-accent: #3b82f6; --ui-border: #3b82f6; --btn-bg: rgba(59, 130, 246, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Orbitron'; --bg-canvas: #111; --player-color: #3b82f6; --player-accent: #fff; --bullet-color: #fff; --enemy-ship-color: #f59e0b; --enemy-ship-accent: #D97706; --enemy-heli-color: #ef4444; --enemy-heli-accent: #DC2626; --enemy-bullet-color: #fff; --fuel-depot-color: #10b981; --fuel-bar-fill: #10b981; --bridge-color: #333; --radar-bg: rgba(20, 20, 20, 0.3); --radar-border: #3b82f6; --radar-sweep: rgba(59, 130, 246, 0.3); }
+        body.theme-vaporwave { --bg-body: #2b0f54; --text-main: #00f3ff; --text-accent: #ff00ff; --ui-border: #ff00ff; --font-main: 'Orbitron'; --font-display: 'Orbitron'; background: linear-gradient(180deg, #2b0f54, #ff0080); --bg-canvas: #1a0b2e; --player-color: #05ffa1; --player-accent: #fff; --bullet-color: #fffb96; --missile-color: #fff; --enemy-ship-color: #ff71ce; --enemy-ship-accent: #F472B6; --enemy-heli-color: #b967ff; --enemy-heli-accent: #D946EF; --enemy-bullet-color: #ff71ce; --fuel-depot-color: #05ffa1; --fuel-bar-fill: #05ffa1; --bridge-color: #4b2370; --radar-bg: rgba(0, 0, 0, 0.3); --radar-border: #ff00ff; --radar-sweep: rgba(5, 255, 161, 0.3); }
+        body.theme-gameboy { --bg-body: #8b9c48; --text-main: #0f380f; --text-accent: #306230; --ui-border: #306230; --btn-bg: rgba(15,56,15,0.1); --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #9bbc0f; --player-color: #0f380f; --player-accent: #306230; --bullet-color: #0f380f; --missile-color: #306230; --enemy-ship-color: #306230; --enemy-ship-accent: #0f380f; --enemy-heli-color: #0f380f; --enemy-heli-accent: #306230; --enemy-bullet-color: #0f380f; --fuel-depot-color: #306230; --fuel-bar-fill: #0f380f; --bridge-color: #8bac0f; --radar-bg: rgba(15, 56, 15, 0.2); --radar-border: #0f380f; --radar-sweep: rgba(15, 56, 15, 0.3); }
+        body.theme-matrix { --bg-body: #000; --text-main: #00ff00; --text-accent: #00ff00; --ui-border: #004400; --btn-bg: #001100; --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #001100; --player-color: #fff; --player-accent: #00ff00; --bullet-color: #fff; --missile-color: #fff; --enemy-ship-color: #00ff00; --enemy-ship-accent: #00bb00; --enemy-heli-color: #00bb00; --enemy-heli-accent: #00ff00; --enemy-bullet-color: #fff; --fuel-depot-color: #fff; --fuel-bar-fill: #00ff00; --bridge-color: #004400; --radar-bg: rgba(0, 20, 0, 0.3); --radar-border: #00ff00; --radar-sweep: rgba(0, 255, 0, 0.3); }
+        body.theme-candy { --bg-body: #fff0f5; --text-main: #555; --text-accent: #ff69b4; --ui-border: #ffb7b2; --btn-bg: rgba(255,183,178,0.2); --font-main: 'Fredoka'; --font-display: 'Fredoka'; --bg-canvas: #B5EAD7; --player-color: #ff69b4; --player-accent: #fff; --bullet-color: #FF9AA2; --missile-color: #555; --enemy-ship-color: #FFB7B2; --enemy-ship-accent: #FF9AA2; --enemy-heli-color: #C7CEEA; --enemy-heli-accent: #A3A3A3; --enemy-bullet-color: #FF9AA2; --fuel-depot-color: #E2F0CB; --fuel-bar-fill: #E2F0CB; --bridge-color: #FFDAC1; --radar-bg: rgba(255, 255, 255, 0.3); --radar-border: #ffb7b2; --radar-sweep: rgba(255, 105, 180, 0.3); }
+        body.theme-darkpro { --bg-body: #0a0a0a; --text-main: #f0f0f0; --text-accent: #3b82f6; --ui-border: #3b82f6; --btn-bg: rgba(59, 130, 246, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Orbitron'; --bg-canvas: #111; --player-color: #3b82f6; --player-accent: #fff; --bullet-color: #fff; --missile-color: #fff; --enemy-ship-color: #f59e0b; --enemy-ship-accent: #D97706; --enemy-heli-color: #ef4444; --enemy-heli-accent: #DC2626; --enemy-bullet-color: #fff; --fuel-depot-color: #10b981; --fuel-bar-fill: #10b981; --bridge-color: #333; --radar-bg: rgba(20, 20, 20, 0.3); --radar-border: #3b82f6; --radar-sweep: rgba(59, 130, 246, 0.3); }
 
         /* --- Base Styles --- */
         body {
@@ -172,6 +173,7 @@
                     <p>Move: A/D or ←/→</p>
                     <p>Speed: W/S or ↑/↓</p>
                     <p>Shoot: Spacebar or FIRE</p>
+                    <p>Missile: 'X' or MISSILE</p>
                     <p>SHOOT GREEN DEPOTS TO REFUEL!</p>
                 </div>
             </div>
@@ -180,17 +182,20 @@
 
     <!-- Controls -->
     <div class="w-full max-w-lg flex items-center justify-between p-2 select-none z-10">
-        <!-- Speed Controls -->
-        <div class="flex flex-col gap-2">
+        <!-- Move/Speed D-Pad -->
+        <div class="grid grid-cols-3 gap-2">
+            <div></div> <!-- Spacer -->
             <button class="control-btn rounded-lg flex items-center justify-center" id="btn-fast"><i class="fas fa-chevron-up"></i></button>
-            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-slow"><i class="fas fa-chevron-down"></i></button>
-        </div>
-        <!-- Fire -->
-        <button class="control-btn rounded-full w-20 h-20 flex items-center justify-center text-lg" id="btn-fire">FIRE</button>
-        <!-- Move Controls -->
-        <div class="flex gap-2">
+            <div></div> <!-- Spacer -->
             <button class="control-btn rounded-lg flex items-center justify-center" id="btn-left"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-slow"><i class="fas fa-chevron-down"></i></button>
             <button class="control-btn rounded-lg flex items-center justify-center" id="btn-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <!-- Fire Controls -->
+        <div class="flex flex-col items-center gap-2">
+            <button class="control-btn rounded-full w-24 h-24 flex items-center justify-center text-lg" id="btn-fire">FIRE</button>
+            <button class="control-btn rounded-full w-20 h-20 flex items-center justify-center text-sm" id="btn-missile">MISSILE</button>
         </div>
     </div>
 
@@ -301,10 +306,11 @@
         const FUEL_REFILL_AMOUNT = 40;
         const RADAR_RANGE = 1000; // World units
         const RADAR_SIZE = 80;
+        const MISSILE_CHARGE_TIME = 10000; // 10 seconds in ms
 
         // Game state
         let score, highScore, isPaused, isGameOver, level, baseScrollSpeed, playerSpeedBonus;
-        let player, bullets, enemyBullets, enemies, fuelDepots, riverSegments, bridges, particles;
+        let player, bullets, enemyBullets, enemies, fuelDepots, riverSegments, bridges, particles, missiles;
         let lives = 3;
         let fuel = 100;
         let rotorAngle = 0; // For heli animation
@@ -316,7 +322,9 @@
         var moveFast = false;
         var moveSlow = false;
         var shooting = false;
+        var shootingMissile = false; // New flag
         let shootCooldown = 0;
+        let missileCooldown = 0; // New cooldown
         
         highScore = localStorage.getItem('riverraid_hs') || 0;
         highScoreEl.innerText = highScore;
@@ -333,6 +341,8 @@
             isGameOver = false;
             lives = 3;
             fuel = 100;
+            shootCooldown = 0;
+            missileCooldown = 0;
             
             // Set canvas resolution
             canvas.width = 400;
@@ -343,11 +353,17 @@
                 y: canvas.height * PLAYER_Y_POS,
                 size: PLAYER_SIZE,
                 speed: 5,
-                invincible: 60 // Invincibility frames after a hit
+                invincible: 60, // Invincibility frames after a hit
+                health: 100,
+                maxHealth: 100,
+                missiles: 3,
+                maxMissiles: 3,
+                missileChargeTimer: 0
             };
             
             bullets = [];
             enemyBullets = [];
+            missiles = [];
             enemies = [];
             fuelDepots = [];
             bridges = [];
@@ -385,15 +401,26 @@
         function playerHit() {
             if (player.invincible > 0) return; // Already hit
             
-            lives--;
-            sound.crash();
-            createExplosion(player.x, player.y, getThemeColor('--player-color'));
+            player.health -= 34; // Take ~1/3 damage
             
-            if (lives <= 0) {
-                setGameOver("GAME OVER");
+            if (player.health <= 0) {
+                // Lost a life
+                lives--;
+                sound.crash();
+                createExplosion(player.x, player.y, getThemeColor('--player-color'));
+                
+                if (lives <= 0) {
+                    setGameOver("GAME OVER");
+                } else {
+                    // Respawn
+                    player.invincible = 120; // 2 seconds of invincibility
+                    player.x = canvas.width / 2; // Reset position
+                    player.health = 100; // Reset health
+                }
             } else {
-                player.invincible = 120; // 2 seconds of invincibility
-                player.x = canvas.width / 2; // Reset position
+                // Just took damage, but not dead
+                sound.explode(); // Use smaller explosion sound
+                player.invincible = 60; // 1 second invincibility
             }
         }
         
@@ -411,6 +438,16 @@
                 size: 4
             });
             sound.shoot();
+        }
+        
+        function createMissile() {
+            missiles.push({
+                x: player.x,
+                y: player.y - player.size,
+                size: 6,
+                speed: 5 // Slower than bullets
+            });
+            sound.shoot(); // TODO: Make a missile sound
         }
         
         function createExplosion(x, y, color) {
@@ -477,7 +514,7 @@
         }
         
         // --- 6. Game Loop ---
-        function update() {
+        function update(delta) {
             if (isPaused || isGameOver) return;
             
             // --- Player Speed Control ---
@@ -495,10 +532,12 @@
             bridges.forEach(b => b.y += currentScrollSpeed);
             particles.forEach(p => p.y += currentScrollSpeed); // Explosions scroll with world
             bullets.forEach(b => b.y -= BULLET_SPEED); // Player bullets move up
+            missiles.forEach(m => m.y -= m.speed); // Missiles move up
             
             // --- Generate/Cull ---
             riverSegments = riverSegments.filter(seg => seg.y < canvas.height + SEGMENT_HEIGHT);
             bullets = bullets.filter(b => b.y > -b.size);
+            missiles = missiles.filter(m => m.y > -m.size);
             enemyBullets = enemyBullets.filter(b => b.y < canvas.height + b.size);
             enemies = enemies.filter(e => e.y < canvas.height + e.size);
             fuelDepots = fuelDepots.filter(f => f.y < canvas.height + f.size);
@@ -518,6 +557,7 @@
             if (currentBank) {
                 if (player.x - player.size / 2 < currentBank.leftX || 
                     player.x + player.size / 2 > currentBank.rightX) {
+                    player.health = 0; // Instant death
                     playerHit();
                 }
             }
@@ -525,9 +565,25 @@
             
             // --- Shooting ---
             if (shootCooldown > 0) shootCooldown--;
+            if (missileCooldown > 0) missileCooldown--;
+            
             if (shooting && shootCooldown <= 0) {
                 createBullet();
                 shootCooldown = 15; // frames
+            }
+            if (shootingMissile && missileCooldown <= 0 && player.missiles > 0) {
+                createMissile();
+                player.missiles--;
+                missileCooldown = 30; // 0.5 sec cooldown
+            }
+            
+            // --- Missile Regen ---
+            if (player.missiles < player.maxMissiles) {
+                player.missileChargeTimer += delta * 1000; // delta is in seconds
+                if (player.missileChargeTimer >= MISSILE_CHARGE_TIME) {
+                    player.missiles++;
+                    player.missileChargeTimer = 0;
+                }
             }
             
             // --- Update Enemies ---
@@ -564,6 +620,7 @@
                             createExplosion(enemies[j].x, enemies[j].y, getThemeColor('--enemy-ship-color'));
                             enemies.splice(j, 1);
                             updateScore(100);
+                            player.health = Math.min(player.maxHealth, player.health + 5); // Restore 5 HP
                         }
                         bullets.splice(i, 1);
                         break;
@@ -589,7 +646,6 @@
             // Bullets vs Bridges
             for (let i = bullets.length - 1; i >= 0; i--) {
                 for (let j = bridges.length - 1; j >= 0; j--) {
-                    // Check collision with center pylon
                     const bridge = bridges[j];
                     const pylonX = canvas.width / 2;
                     const pylonSize = 15;
@@ -605,6 +661,71 @@
                     }
                 }
             }
+            
+            // Missiles vs Entities
+            for (let i = missiles.length - 1; i >= 0; i--) {
+                let missileHit = false;
+                // vs Enemies
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (isColliding(missiles[i], enemies[j])) {
+                        enemies[j].health -= 50; // Missile damage
+                        if (enemies[j].health <= 0) {
+                            createExplosion(enemies[j].x, enemies[j].y, getThemeColor('--enemy-ship-color'));
+                            enemies.splice(j, 1);
+                            updateScore(100);
+                            player.health = Math.min(player.maxHealth, player.health + 5); // Restore 5 HP
+                        }
+                        missileHit = true;
+                        break;
+                    }
+                }
+                if (missileHit) {
+                    createExplosion(missiles[i].x, missiles[i].y, getThemeColor('--bullet-color'));
+                    missiles.splice(i, 1);
+                    continue;
+                }
+                
+                // vs Fuel
+                for (let j = fuelDepots.length - 1; j >= 0; j--) {
+                    if (isColliding(missiles[i], fuelDepots[j])) {
+                        sound.refuel();
+                        fuel = Math.min(100, fuel + FUEL_REFILL_AMOUNT);
+                        createExplosion(fuelDepots[j].x, fuelDepots[j].y, getThemeColor('--fuel-depot-color'));
+                        fuelDepots.splice(j, 1);
+                        updateScore(50);
+                        missileHit = true;
+                        break;
+                    }
+                }
+                 if (missileHit) {
+                    createExplosion(missiles[i].x, missiles[i].y, getThemeColor('--bullet-color'));
+                    missiles.splice(i, 1);
+                    continue;
+                }
+
+                // vs Bridges
+                for (let j = bridges.length - 1; j >= 0; j--) {
+                    const bridge = bridges[j];
+                    const pylonX = canvas.width / 2;
+                    const pylonSize = 15;
+                    if (isColliding(missiles[i], {x: pylonX, y: bridge.y, size: pylonSize})) {
+                        bridge.health -= 30; // Missiles do full damage
+                        if (bridge.health <= 0) {
+                            createExplosion(pylonX, bridge.y, getThemeColor('--bridge-color'));
+                            bridges.splice(j, 1);
+                            updateScore(200);
+                        }
+                        missileHit = true;
+                        break;
+                    }
+                }
+                 if (missileHit) {
+                    createExplosion(missiles[i].x, missiles[i].y, getThemeColor('--bullet-color'));
+                    missiles.splice(i, 1);
+                    continue;
+                }
+            }
+
 
             // Player vs Enemies / Fuel / Enemy Bullets
             if (!player.invincible) {
@@ -612,7 +733,12 @@
                     if (isColliding(player, e)) { playerHit(); break; }
                 }
                 for (const f of fuelDepots) {
-                    if (isColliding(player, f)) { playerHit(); break; } // Crash into fuel
+                    if (isColliding(player, f)) { 
+                        // Crashing into fuel is instant death
+                        player.health = 0;
+                        playerHit(); 
+                        break; 
+                    } 
                 }
                 for (const b of enemyBullets) {
                     if (isColliding(player, b)) { playerHit(); break; }
@@ -622,6 +748,8 @@
             // Player vs Bridges
             for (const b of bridges) {
                 if (Math.abs(player.y - b.y) < player.size / 2) {
+                    // Crashing into bridge is instant death
+                    player.health = 0;
                     playerHit();
                     break;
                 }
@@ -679,6 +807,19 @@
             ctx.fillStyle = getThemeColor('--bullet-color');
             for (const b of bullets) {
                 ctx.fillRect(b.x - b.size / 2, b.y - b.size / 2, b.size, b.size * 2); // Elongated
+            }
+            
+            // Draw Missiles
+            ctx.fillStyle = getThemeColor('--missile-color');
+            for (const m of missiles) {
+                ctx.save();
+                ctx.translate(m.x, m.y);
+                ctx.fillStyle = getThemeColor('--bullet-color'); // Thrust
+                ctx.fillRect(-m.size/2, m.size, m.size, m.size/2);
+                ctx.fillStyle = getThemeColor('--missile-color');
+                ctx.fillRect(-m.size / 2, -m.size * 1.5, m.size, m.size * 3); // Long rectangle
+                ctx.fillRect(-m.size, m.size*0.8, m.size * 2, m.size / 2); // Fins
+                ctx.restore();
             }
             
             // Draw Enemy Bullets
@@ -834,6 +975,34 @@
             ctx.font = '12px Orbitron';
             ctx.fillText('FUEL', 10, canvas.height - 35);
             
+            // --- HEALTH BAR ---
+            const healthBarWidth = 100;
+            const healthBarX = 120; // Position it next to fuel
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)'; // Red background
+            ctx.fillRect(healthBarX, canvas.height - 30, healthBarWidth, fuelBarHeight);
+            
+            ctx.fillStyle = getThemeColor('--player-color'); // Green fill
+            ctx.fillRect(healthBarX, canvas.height - 30, healthBarWidth * (player.health / player.maxHealth), fuelBarHeight);
+            
+            ctx.fillStyle = getThemeColor('--text-main');
+            ctx.font = '12px Orbitron';
+            ctx.fillText('HEALTH', healthBarX, canvas.height - 35);
+            
+            // --- MISSILE HUD ---
+            const missileBarX = 230;
+            ctx.fillStyle = getThemeColor('--text-main');
+            ctx.font = '16px Orbitron';
+            ctx.fillText(`M: ${player.missiles}`, missileBarX, canvas.height - 18);
+            
+            // Draw recharge bar
+            if (player.missiles < player.maxMissiles) {
+                const rechargePercent = player.missileChargeTimer / MISSILE_CHARGE_TIME;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillRect(missileBarX + 45, canvas.height - 28, 50, 10);
+                ctx.fillStyle = getThemeColor('--bullet-color');
+                ctx.fillRect(missileBarX + 45, canvas.height - 28, 50 * rechargePercent, 10);
+            }
+
             // Lives
             ctx.fillStyle = getThemeColor('--player-color');
             ctx.font = '16px Orbitron';
@@ -891,6 +1060,7 @@
             enemies.forEach(e => drawBlip(e, getThemeColor(e.type === 'ship' ? '--enemy-ship-color' : '--enemy-heli-color')));
             fuelDepots.forEach(f => drawBlip(f, getThemeColor('--fuel-depot-color')));
             bridges.forEach(b => drawBlip({x: canvas.width / 2, y: b.y}, getThemeColor('--bridge-color')));
+            missiles.forEach(m => drawBlip(m, getThemeColor('--missile-color')));
             
             // Draw border
             radarCtx.strokeStyle = getThemeColor('--radar-border');
@@ -900,9 +1070,15 @@
             radarCtx.stroke();
         }
 
-        function gameLoop() {
+        function gameLoop(time) {
             if (isGameOver) return;
-            update();
+            
+            const delta = (time - lastTime) / 1000; // Delta in seconds
+            lastTime = time;
+            
+            if (!isPaused && delta > 0) { // Added delta check for stability
+                update(delta);
+            }
             draw();
             requestAnimationFrame(gameLoop);
         }
@@ -940,6 +1116,7 @@
                 case 'ArrowUp': case 'w': moveFast = true; break;
                 case 'ArrowDown': case 's': moveSlow = true; break;
                 case ' ': shooting = true; break;
+                case 'x': shootingMissile = true; break; // 'x' for missile
             }
         });
         document.addEventListener('keyup', e => {
@@ -949,6 +1126,7 @@
                 case 'ArrowUp': case 'w': moveFast = false; break;
                 case 'ArrowDown': case 's': moveSlow = false; break;
                 case ' ': shooting = false; break;
+                case 'x': shootingMissile = false; break;
             }
         });
         
@@ -971,6 +1149,7 @@
         bindBtn('btn-fast', 'moveFast');
         bindBtn('btn-slow', 'moveSlow');
         bindBtn('btn-fire', 'shooting');
+        bindBtn('btn-missile', 'shootingMissile'); // Bind new button
         
         // Handle window resize
         function resizeCanvas() {
