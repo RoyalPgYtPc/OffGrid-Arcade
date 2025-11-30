@@ -2,9 +2,9 @@
 
 **OffGrid Arcade** is a curated hub for lightweight HTML games you can play anywhere — no adverts, no tracking, and no constant connection. Fast, distraction-free gameplay straight in your browser.
 
-**Play now:** https://royalpgytpc.github.io/OffGrid-Arcade/
+**Play now:** [https://royalpgytpc.github.io/OffGrid-Arcade/]
 
-##  Features
+## Features
 
 - Works online or offline after first load
 - Runs in any modern browser
@@ -12,9 +12,10 @@
 - Lightweight and optimised
 - Open to personal use under a custom licence
 
-##  Game Catalogue
+## Game Catalogue
 
 **Currently available**
+
 - Tetris
 - Snake
 - Breakout

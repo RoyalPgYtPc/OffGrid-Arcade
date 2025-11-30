@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riverraid Recreated v4</title>a
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Import Tone.js for audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=VT323&family=Fredoka:wght@500;700&family=Orbitron:wght@500;700&family=Press+Start+2P&display=swap');
+
+        /* --- CSS Variables (Default: NEON) --- */
+        :root {
+            --bg-body: #0f0f1a; /* Land Color */
+            --text-main: #fff;
+            --text-accent: #ff0055;
+            --ui-border: rgba(255, 255, 255, 0.15);
+            --btn-bg: rgba(255, 255, 255, 0.08);
+            --font-main: 'Chakra Petch', sans-serif;
+            --font-display: 'Orbitron', sans-serif;
+            
+            /* Game-specific colors */
+            --bg-canvas: #003366; /* River Color */
+            --player-color: #0DFF72;
+            --player-accent: #FFFFFF; /* Cockpit */
+            --bullet-color: #FFE138;
+            --enemy-ship-color: #FF8E0D;
+            --enemy-ship-accent: #D97706; /* Ship cabin */
+            --enemy-heli-color: #F538FF;
+            --enemy-heli-accent: #EC4899; /* Heli rotor */
+            --enemy-bullet-color: #FF0D72;
+            --fuel-depot-color: #0DFF72;
+            --fuel-bar-fill: #0DFF72;
+            --fuel-bar-bg: rgba(255, 0, 85, 0.3);
+            --bridge-color: #6a6a8a;
+            --radar-bg: rgba(0, 0, 0, 0.3);
+            --radar-border: rgba(255, 255, 255, 0.2);
+            --radar-sweep: rgba(0, 255, 0, 0.3);
+        }
+
+        /* --- Theme Overrides --- */
+        body.theme-vaporwave { --bg-body: #2b0f54; --text-main: #00f3ff; --text-accent: #ff00ff; --ui-border: #ff00ff; --font-main: 'Orbitron'; --font-display: 'Orbitron'; background: linear-gradient(180deg, #2b0f54, #ff0080); --bg-canvas: #1a0b2e; --player-color: #05ffa1; --player-accent: #fff; --bullet-color: #fffb96; --enemy-ship-color: #ff71ce; --enemy-ship-accent: #F472B6; --enemy-heli-color: #b967ff; --enemy-heli-accent: #D946EF; --enemy-bullet-color: #ff71ce; --fuel-depot-color: #05ffa1; --fuel-bar-fill: #05ffa1; --bridge-color: #4b2370; --radar-bg: rgba(0, 0, 0, 0.3); --radar-border: #ff00ff; --radar-sweep: rgba(5, 255, 161, 0.3); }
+        body.theme-gameboy { --bg-body: #8b9c48; --text-main: #0f380f; --text-accent: #306230; --ui-border: #306230; --btn-bg: rgba(15,56,15,0.1); --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #9bbc0f; --player-color: #0f380f; --player-accent: #306230; --bullet-color: #0f380f; --enemy-ship-color: #306230; --enemy-ship-accent: #0f380f; --enemy-heli-color: #0f380f; --enemy-heli-accent: #306230; --enemy-bullet-color: #0f380f; --fuel-depot-color: #306230; --fuel-bar-fill: #0f380f; --bridge-color: #8bac0f; --radar-bg: rgba(15, 56, 15, 0.2); --radar-border: #0f380f; --radar-sweep: rgba(15, 56, 15, 0.3); }
+        body.theme-matrix { --bg-body: #000; --text-main: #00ff00; --text-accent: #00ff00; --ui-border: #004400; --btn-bg: #001100; --font-main: 'VT323'; --font-display: 'VT323'; --bg-canvas: #001100; --player-color: #fff; --player-accent: #00ff00; --bullet-color: #fff; --enemy-ship-color: #00ff00; --enemy-ship-accent: #00bb00; --enemy-heli-color: #00bb00; --enemy-heli-accent: #00ff00; --enemy-bullet-color: #fff; --fuel-depot-color: #fff; --fuel-bar-fill: #00ff00; --bridge-color: #004400; --radar-bg: rgba(0, 20, 0, 0.3); --radar-border: #00ff00; --radar-sweep: rgba(0, 255, 0, 0.3); }
+        body.theme-candy { --bg-body: #fff0f5; --text-main: #555; --text-accent: #ff69b4; --ui-border: #ffb7b2; --btn-bg: rgba(255,183,178,0.2); --font-main: 'Fredoka'; --font-display: 'Fredoka'; --bg-canvas: #B5EAD7; --player-color: #ff69b4; --player-accent: #fff; --bullet-color: #FF9AA2; --enemy-ship-color: #FFB7B2; --enemy-ship-accent: #FF9AA2; --enemy-heli-color: #C7CEEA; --enemy-heli-accent: #A3A3A3; --enemy-bullet-color: #FF9AA2; --fuel-depot-color: #E2F0CB; --fuel-bar-fill: #E2F0CB; --bridge-color: #FFDAC1; --radar-bg: rgba(255, 255, 255, 0.3); --radar-border: #ffb7b2; --radar-sweep: rgba(255, 105, 180, 0.3); }
+        body.theme-darkpro { --bg-body: #0a0a0a; --text-main: #f0f0f0; --text-accent: #3b82f6; --ui-border: #3b82f6; --btn-bg: rgba(59, 130, 246, 0.1); --font-main: 'Chakra Petch'; --font-display: 'Orbitron'; --bg-canvas: #111; --player-color: #3b82f6; --player-accent: #fff; --bullet-color: #fff; --enemy-ship-color: #f59e0b; --enemy-ship-accent: #D97706; --enemy-heli-color: #ef4444; --enemy-heli-accent: #DC2626; --enemy-bullet-color: #fff; --fuel-depot-color: #10b981; --fuel-bar-fill: #10b981; --bridge-color: #333; --radar-bg: rgba(20, 20, 20, 0.3); --radar-border: #3b82f6; --radar-sweep: rgba(59, 130, 246, 0.3); }
+
+        /* --- Base Styles --- */
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow: hidden;
+            touch-action: none; 
+            height: 100dvh;
+            width: 100vw;
+            transition: background 0.4s ease, color 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+        }
+
+        .game-canvas {
+            image-rendering: pixelated;
+            background-color: var(--bg-canvas);
+            border: 2px solid var(--ui-border);
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+            transition: border-color 0.4s ease, background-color 0.4s ease;
+            cursor: none;
+            width: 100%;
+            max-width: 400px; /* Classic portrait aspect */
+            aspect-ratio: 9 / 16;
+        }
+        
+        #radar-canvas {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+            background-color: var(--radar-bg);
+            border: 2px solid var(--radar-border);
+            border-radius: 50%;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+        }
+        
+        #score, #overlay-title, #high-score, #level, .util-btn, #lives {
+            font-family: var(--font-display);
+        }
+
+        .util-btn {
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border: 1px solid var(--ui-border);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--btn-bg);
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        /* --- Controls --- */
+        .control-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--ui-border);
+            backdrop-filter: blur(4px);
+            transition: transform 0.05s, background 0.05s;
+            touch-action: manipulation;
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            width: 60px; /* Made smaller */
+            height: 60px;
+            font-size: 20px;
+        }
+        
+        .control-btn:active, .control-btn.active-state {
+            background: var(--text-accent);
+            color: var(--bg-body);
+            transform: scale(0.95);
+            border-color: var(--text-accent);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between p-2">
+
+    <!-- Top Bar -->
+    <div class="w-full max-w-lg flex justify-between items-center p-2 z-10">
+        <div class="flex flex-col items-start">
+            <div class="text-[10px] opacity-70">SCORE</div>
+            <div class="text-3xl font-bold tracking-widest" id="score">0</div>
+        </div>
+        <button id="theme-btn" class="util-btn">THEME: NEON</button>
+        <div class="flex flex-col items-end">
+            <div class="text-[10px] opacity-70">HIGH SCORE</div>
+            <div class="text-3xl font-bold tracking-widest" id="high-score">0</div>
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="relative flex-1 min-h-0 w-full flex items-center justify-center py-2">
+        <canvas id="game-canvas" class="game-canvas rounded-lg"></canvas>
+        <canvas id="radar-canvas" width="80" height="80"></canvas>
+        
+        <!-- Overlay -->
+        <div id="overlay" class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center p-4">
+            <div class="bg-black/80 backdrop-blur-md p-8 rounded-lg border-2 border-[var(--ui-border)] max-w-sm">
+                <h2 id="overlay-title" class="text-4xl font-bold mb-4 tracking-tighter text-[var(--text-accent)] drop-shadow-lg">Riverraid Recreated</h2>
+                
+                <!-- Disclaimer -->
+                <div class="text-xs text-gray-400 text-left mb-6 border-l-2 border-[var(--ui-border)] pl-3">
+                    <p>This is an independent hobby project.</p>
+                    <p>It is not affiliated with, endorsed by, or connected to Activision.</p>
+                    <p>No original River Raid code or assets are used.</p>
+                </div>
+                
+                <div class="text-xs opacity-70 mb-8 font-mono">HIGH SCORE: <span id="high-score-overlay">0</span></div>
+                
+                <button id="start-btn" class="px-8 py-4 bg-[var(--text-accent)] text-[var(--bg-body)] font-bold text-xl rounded shadow-lg active:scale-95 transition-transform border border-white/20 mb-4 cursor-pointer z-50">
+                    START GAME
+                </button>
+                
+                <div class="flex flex-col gap-1 text-[10px] text-gray-400 mt-2">
+                    <p>Move: A/D or ←/→</p>
+                    <p>Speed: W/S or ↑/↓</p>
+                    <p>Shoot: Spacebar or FIRE</p>
+                    <p>SHOOT GREEN DEPOTS TO REFUEL!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="w-full max-w-lg flex items-center justify-between p-2 select-none z-10">
+        <!-- Speed Controls -->
+        <div class="flex flex-col gap-2">
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-fast"><i class="fas fa-chevron-up"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-slow"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <!-- Fire -->
+        <button class="control-btn rounded-full w-20 h-20 flex items-center justify-center text-lg" id="btn-fire">FIRE</button>
+        <!-- Move Controls -->
+        <div class="flex gap-2">
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-left"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn rounded-lg flex items-center justify-center" id="btn-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Sound Engine ---
+        let audioReady = false;
+        const sound = {
+            synth: new Tone.Synth().toDestination(),
+            noise: new Tone.NoiseSynth().toDestination(),
+            
+            init() {
+                // Configure noise for a sharp "shot"
+                this.noise.noise.type = 'white';
+                this.noise.envelope.attack = 0.001; // very fast attack
+                this.noise.envelope.decay = 0.05;  // very short decay
+                this.noise.envelope.sustain = 0;
+                this.noise.volume.value = -8; // Slightly louder than before
+
+                // Configure synth for the "thump"
+                this.synth.oscillator.type = 'triangle'; // triangle is a bit softer than sine
+                this.synth.volume.value = -5;
+                this.synth.envelope.attack = 0.001;
+                this.synth.envelope.decay = 0.1;
+                this.synth.envelope.sustain = 0;
+            },
+            shoot() {
+                if (!audioReady) return;
+                // Trigger the pre-configured noise
+                this.noise.triggerAttack(); 
+                
+                // Trigger the pre-configured synth for the low-end "thump"
+                this.synth.triggerAttackRelease("E2", "32n"); // Low E, very short
+            },
+            explode() {
+                if (!audioReady) return;
+                // Use a different noise config for explosion
+                const explosionNoise = new Tone.NoiseSynth({
+                    noise: { type: 'pink' },
+                    envelope: { attack: 0.005, decay: 0.2, sustain: 0 }
+                }).toDestination();
+                explosionNoise.volume.value = -5;
+                explosionNoise.triggerAttack();
+            },
+            crash() {
+                if (!audioReady) return;
+                // Use a different noise config for explosion
+                const crashNoise = new Tone.NoiseSynth({
+                    noise: { type: 'pink' },
+                    envelope: { attack: 0.01, decay: 0.5, sustain: 0 }
+                }).toDestination();
+                crashNoise.volume.value = -2;
+                crashNoise.triggerAttack();
+            },
+            refuel() {
+                if (!audioReady) return;
+                // Use the main synth for this, but reconfigure it quickly
+                const refuelSynth = new Tone.Synth().toDestination();
+                refuelSynth.envelope.attack = 0.01;
+                refuelSynth.envelope.release = 0.1;
+                refuelSynth.triggerAttackRelease("C4", "16n", Tone.now());
+                refuelSynth.triggerAttackRelease("E4", "16n", Tone.now() + 0.1);
+                refuelSynth.triggerAttackRelease("G4", "16n", Tone.now() + 0.2);
+            }
+        };
+        sound.init(); // Initialize the main synths
+
+        // --- 2. Theme Engine ---
+        const THEMES = [
+            { name: 'NEON', id: '' }, { name: 'VAPOR', id: 'theme-vaporwave' }, { name: 'GAMEBOY', id: 'theme-gameboy' },
+            { name: 'MATRIX', id: 'theme-matrix' }, { name: 'CANDY', id: 'theme-candy' }, { name: 'DARKPRO', id: 'theme-darkpro' }
+        ];
+        let themeIndex = 0;
+        let currentTheme = THEMES[0];
+        const themeBtn = document.getElementById('theme-btn');
+        
+        themeBtn.addEventListener('click', () => {
+            if(currentTheme.id) document.body.classList.remove(currentTheme.id);
+            themeIndex = (themeIndex + 1) % THEMES.length;
+            currentTheme = THEMES[themeIndex];
+            if(currentTheme.id) document.body.classList.add(currentTheme.id);
+            themeBtn.innerText = `THEME: ${currentTheme.name}`;
+        });
+
+        function getThemeColor(varName) {
+            return getComputedStyle(document.body).getPropertyValue(varName);
+        }
+
+        // --- 3. Game Setup ---
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const radarCanvas = document.getElementById('radar-canvas');
+        const radarCtx = radarCanvas.getContext('2d');
+        
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('start-btn');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('high-score');
+        const highScoreOverlayEl = document.getElementById('high-score-overlay');
+
+        // Game constants
+        const PLAYER_SIZE = 16;
+        const PLAYER_Y_POS = 0.85; // 85% from top
+        const BULLET_SPEED = 7;
+        const SEGMENT_HEIGHT = 10; // Height of one river segment
+        const MIN_RIVER_WIDTH = 80;
+        const MAX_RIVER_WIDTH = 300;
+        const FUEL_BURN_RATE = 0.03;
+        const FUEL_REFILL_AMOUNT = 40;
+        const RADAR_RANGE = 1000; // World units
+        const RADAR_SIZE = 80;
+
+        // Game state
+        let score, highScore, isPaused, isGameOver, level, baseScrollSpeed, playerSpeedBonus;
+        let player, bullets, enemyBullets, enemies, fuelDepots, riverSegments, bridges, particles;
+        let lives = 3;
+        let fuel = 100;
+        let rotorAngle = 0; // For heli animation
+        let radarSweepAngle = 0;
+        
+        // Control flags
+        var moveLeft = false;
+        var moveRight = false;
+        var moveFast = false;
+        var moveSlow = false;
+        var shooting = false;
+        let shootCooldown = 0;
+        
+        highScore = localStorage.getItem('riverraid_hs') || 0;
+        highScoreEl.innerText = highScore;
+        highScoreOverlayEl.innerText = highScore;
+        
+        // --- 4. Game Objects & State ---
+        
+        function initGame() {
+            score = 0;
+            level = 1;
+            baseScrollSpeed = 2.5;
+            playerSpeedBonus = 0;
+            isPaused = false;
+            isGameOver = false;
+            lives = 3;
+            fuel = 100;
+            
+            // Set canvas resolution
+            canvas.width = 400;
+            canvas.height = 711; // 16:9 aspect ratio (portrait)
+
+            player = {
+                x: canvas.width / 2,
+                y: canvas.height * PLAYER_Y_POS,
+                size: PLAYER_SIZE,
+                speed: 5,
+                invincible: 60 // Invincibility frames after a hit
+            };
+            
+            bullets = [];
+            enemyBullets = [];
+            enemies = [];
+            fuelDepots = [];
+            bridges = [];
+            particles = [];
+            riverSegments = [];
+            
+            // Initialize the river
+            let initialLeft = canvas.width / 2 - 100;
+            let initialRight = canvas.width / 2 + 100;
+            for (let y = canvas.height + SEGMENT_HEIGHT; y > -SEGMENT_HEIGHT; y -= SEGMENT_HEIGHT) {
+                riverSegments.unshift({ y: y, leftX: initialLeft, rightX: initialRight });
+            }
+
+            updateScore(0);
+            
+            overlay.style.display = 'none';
+            gameLoop();
+        }
+
+        function setGameOver(reason) {
+            isGameOver = true;
+            isPaused = true;
+            sound.crash();
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('riverraid_hs', highScore);
+                highScoreEl.innerText = highScore;
+                highScoreOverlayEl.innerText = highScore;
+            }
+            overlay.style.display = 'flex';
+            document.getElementById('overlay-title').innerText = reason;
+            startBtn.innerText = "RESTART";
+        }
+        
+        function playerHit() {
+            if (player.invincible > 0) return; // Already hit
+            
+            lives--;
+            sound.crash();
+            createExplosion(player.x, player.y, getThemeColor('--player-color'));
+            
+            if (lives <= 0) {
+                setGameOver("GAME OVER");
+            } else {
+                player.invincible = 120; // 2 seconds of invincibility
+                player.x = canvas.width / 2; // Reset position
+            }
+        }
+        
+        function updateScore(amount) {
+            score += amount;
+            scoreEl.innerText = score;
+            // Increase difficulty over time
+            baseScrollSpeed = 2.5 + (score / 5000);
+        }
+        
+        function createBullet() {
+            bullets.push({
+                x: player.x,
+                y: player.y - player.size,
+                size: 4
+            });
+            sound.shoot();
+        }
+        
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    size: Math.random() * 3 + 1,
+                    life: 30, // 30 frames
+                    color: color
+                });
+            }
+            sound.explode();
+        }
+        
+        // --- 5. River Generation & Spawning ---
+        
+        function generateNewRiverSegment() {
+            const topSegment = riverSegments[0];
+            const lastLeft = topSegment.leftX;
+            const lastRight = topSegment.rightX;
+            
+            let newLeft = lastLeft + (Math.random() - 0.5) * 15;
+            let newRight = lastRight + (Math.random() - 0.5) * 15;
+            
+            newLeft = Math.max(0, newLeft);
+            newRight = Math.min(canvas.width, newRight);
+            
+            if (newRight - newLeft < MIN_RIVER_WIDTH) {
+                newLeft = (newLeft + newRight) / 2 - MIN_RIVER_WIDTH / 2;
+                newRight = newLeft + MIN_RIVER_WIDTH;
+            }
+            if (newRight - newLeft > MAX_RIVER_WIDTH) {
+                newLeft = (newLeft + newRight) / 2 - MAX_RIVER_WIDTH / 2;
+                newRight = newLeft + MAX_RIVER_WIDTH;
+            }
+            
+            riverSegments.unshift({ y: topSegment.y - SEGMENT_HEIGHT, leftX: newLeft, rightX: newRight });
+            
+            // --- Spawn Entities ---
+            const spawnChance = 0.05 + (level * 0.01);
+            if (Math.random() < spawnChance) {
+                const x = newLeft + Math.random() * (newRight - newLeft);
+                const y = topSegment.y;
+                
+                const entityType = Math.random();
+                if (entityType < 0.15) { // Fuel
+                    fuelDepots.push({ x: x, y: y, size: 12 });
+                } else if (entityType < 0.5) { // Ship
+                    enemies.push({ type: 'ship', x: x, y: y, size: 10, health: 10 });
+                } else if (entityType < 0.8) { // Heli
+                    enemies.push({ 
+                        type: 'heli', x: x, y: y, size: 12, health: 20, 
+                        vx: (Math.random() - 0.5) * 2, shootCooldown: 60
+                    });
+                } else if (entityType < 0.85) { // Bridge
+                    // Ensure no other bridge is nearby
+                    if (!bridges.find(b => b.y < 100)) {
+                         bridges.push({ y: topSegment.y, leftX: newLeft, rightX: newRight, health: 30 });
+                    }
+                }
+            }
+        }
+        
+        // --- 6. Game Loop ---
+        function update() {
+            if (isPaused || isGameOver) return;
+            
+            // --- Player Speed Control ---
+            if (moveFast) playerSpeedBonus = 2;
+            else if (moveSlow) playerSpeedBonus = -1.5;
+            else playerSpeedBonus = 0;
+            
+            let currentScrollSpeed = Math.max(1.0, baseScrollSpeed + playerSpeedBonus);
+            
+            // --- Scroll World ---
+            riverSegments.forEach(seg => seg.y += currentScrollSpeed);
+            enemies.forEach(e => e.y += currentScrollSpeed);
+            enemyBullets.forEach(b => b.y += currentScrollSpeed + 3); // Move down faster
+            fuelDepots.forEach(f => f.y += currentScrollSpeed);
+            bridges.forEach(b => b.y += currentScrollSpeed);
+            particles.forEach(p => p.y += currentScrollSpeed); // Explosions scroll with world
+            bullets.forEach(b => b.y -= BULLET_SPEED); // Player bullets move up
+            
+            // --- Generate/Cull ---
+            riverSegments = riverSegments.filter(seg => seg.y < canvas.height + SEGMENT_HEIGHT);
+            bullets = bullets.filter(b => b.y > -b.size);
+            enemyBullets = enemyBullets.filter(b => b.y < canvas.height + b.size);
+            enemies = enemies.filter(e => e.y < canvas.height + e.size);
+            fuelDepots = fuelDepots.filter(f => f.y < canvas.height + f.size);
+            bridges = bridges.filter(b => b.y < canvas.height + 20);
+            particles = particles.filter(p => p.life > 0);
+            
+            if (riverSegments[0].y > -SEGMENT_HEIGHT) {
+                generateNewRiverSegment();
+            }
+            
+            // --- Player Control ---
+            if (moveLeft) player.x -= player.speed;
+            if (moveRight) player.x += player.speed;
+            
+            // --- Player vs Bank Collision ---
+            const currentBank = riverSegments.find(seg => player.y >= seg.y && player.y < seg.y + SEGMENT_HEIGHT);
+            if (currentBank) {
+                if (player.x - player.size / 2 < currentBank.leftX || 
+                    player.x + player.size / 2 > currentBank.rightX) {
+                    playerHit();
+                }
+            }
+            player.x = Math.max(0, Math.min(canvas.width, player.x)); // Clamp to screen
+            
+            // --- Shooting ---
+            if (shootCooldown > 0) shootCooldown--;
+            if (shooting && shootCooldown <= 0) {
+                createBullet();
+                shootCooldown = 15; // frames
+            }
+            
+            // --- Update Enemies ---
+            rotorAngle += 0.5; // Animate rotor
+            enemies.forEach(e => {
+                if (e.type === 'heli') {
+                    e.x += e.vx;
+                    if (currentBank && (e.x < currentBank.leftX + 10 || e.x > currentBank.rightX - 10)) {
+                        e.vx *= -1; // Bounce off banks
+                    }
+                    // Heli shooting
+                    e.shootCooldown--;
+                    if (e.shootCooldown <= 0 && e.y < player.y && e.y > 0) {
+                        enemyBullets.push({ x: e.x, y: e.y, size: 4 });
+                        e.shootCooldown = 90 + Math.random() * 60; // 1.5-2.5 sec
+                    }
+                }
+            });
+            
+            // --- Update Particles ---
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+            });
+            
+            // --- Collisions ---
+            // Bullets vs Enemies
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (isColliding(bullets[i], enemies[j])) {
+                        enemies[j].health -= 10;
+                        if (enemies[j].health <= 0) {
+                            createExplosion(enemies[j].x, enemies[j].y, getThemeColor('--enemy-ship-color'));
+                            enemies.splice(j, 1);
+                            updateScore(100);
+                        }
+                        bullets.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            
+            // Bullets vs Fuel
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = fuelDepots.length - 1; j >= 0; j--) {
+                    if (isColliding(bullets[i], fuelDepots[j])) {
+                        sound.refuel();
+                        fuel = Math.min(100, fuel + FUEL_REFILL_AMOUNT);
+                        createExplosion(fuelDepots[j].x, fuelDepots[j].y, getThemeColor('--fuel-depot-color'));
+                        fuelDepots.splice(j, 1);
+                        bullets.splice(i, 1);
+                        updateScore(50);
+                        break;
+                    }
+                }
+            }
+            
+            // Bullets vs Bridges
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                for (let j = bridges.length - 1; j >= 0; j--) {
+                    // Check collision with center pylon
+                    const bridge = bridges[j];
+                    const pylonX = canvas.width / 2;
+                    const pylonSize = 15;
+                    if (isColliding(bullets[i], {x: pylonX, y: bridge.y, size: pylonSize})) {
+                        bridge.health -= 10;
+                        if (bridge.health <= 0) {
+                            createExplosion(pylonX, bridge.y, getThemeColor('--bridge-color'));
+                            bridges.splice(j, 1);
+                            updateScore(200);
+                        }
+                        bullets.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            // Player vs Enemies / Fuel / Enemy Bullets
+            if (!player.invincible) {
+                for (const e of enemies) {
+                    if (isColliding(player, e)) { playerHit(); break; }
+                }
+                for (const f of fuelDepots) {
+                    if (isColliding(player, f)) { playerHit(); break; } // Crash into fuel
+                }
+                for (const b of enemyBullets) {
+                    if (isColliding(player, b)) { playerHit(); break; }
+                }
+            }
+            
+            // Player vs Bridges
+            for (const b of bridges) {
+                if (Math.abs(player.y - b.y) < player.size / 2) {
+                    playerHit();
+                    break;
+                }
+            }
+            
+            // --- Fuel ---
+            fuel -= (FUEL_BURN_RATE + (currentScrollSpeed * 0.015)); // Fuel burns faster at high speed
+            if (fuel <= 0) {
+                fuel = 0;
+                setGameOver("OUT OF FUEL");
+            }
+            
+            // --- Invincibility ---
+            if (player.invincible > 0) player.invincible--;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw River
+            ctx.fillStyle = getThemeColor('--bg-canvas');
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Land (River Banks)
+            ctx.fillStyle = getThemeColor('--bg-body');
+            for (const seg of riverSegments) {
+                ctx.fillRect(0, seg.y, seg.leftX, SEGMENT_HEIGHT + 1); // +1 to overlap
+                ctx.fillRect(seg.rightX, seg.y, canvas.width - seg.rightX, SEGMENT_HEIGHT + 1);
+            }
+            
+            // Draw Bridges
+            ctx.fillStyle = getThemeColor('--bridge-color');
+            for (const b of bridges) {
+                const pylonSize = 15;
+                // Left span
+                ctx.fillRect(b.leftX, b.y - 5, (canvas.width / 2 - pylonSize / 2) - b.leftX, 10);
+                // Right span
+                ctx.fillRect(canvas.width / 2 + pylonSize / 2, b.y - 5, b.rightX - (canvas.width / 2 + pylonSize / 2), 10);
+                // Center Pylon
+                ctx.fillRect(canvas.width / 2 - pylonSize / 2, b.y - 10, pylonSize, 20);
+            }
+            
+            // Draw Fuel Depots
+            ctx.fillStyle = getThemeColor('--fuel-depot-color');
+            for (const f of fuelDepots) {
+                ctx.fillRect(f.x - f.size / 2, f.y - f.size / 2, f.size, f.size);
+            }
+            
+            // Draw Enemies
+            for (const e of enemies) {
+                drawEnemy(e);
+            }
+            
+            // Draw Bullets
+            ctx.fillStyle = getThemeColor('--bullet-color');
+            for (const b of bullets) {
+                ctx.fillRect(b.x - b.size / 2, b.y - b.size / 2, b.size, b.size * 2); // Elongated
+            }
+            
+            // Draw Enemy Bullets
+            ctx.fillStyle = getThemeColor('--enemy-bullet-color');
+            for (const b of enemyBullets) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Player
+            drawPlayer();
+            
+            // Draw Particles
+            for (const p of particles) {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.globalAlpha = 1.0;
+            }
+            
+            // Draw HUD (Fuel and Lives)
+            drawHUD();
+            
+            // Draw Radar
+            drawRadar();
+        }
+
+        // --- NEW/MODIFIED DRAW FUNCTIONS ---
+
+        function drawEnemy(e) {
+            ctx.save();
+            ctx.translate(e.x, e.y);
+            
+            if (e.type === 'ship') {
+                const sSize = e.size * 1.5; // Make ships bigger
+                // Main hull
+                ctx.fillStyle = getThemeColor('--enemy-ship-color');
+                ctx.beginPath();
+                ctx.moveTo(0, -sSize * 0.8); // Bow (front)
+                ctx.lineTo(sSize * 0.7, 0); // Right mid
+                ctx.lineTo(sSize * 0.7, sSize * 0.8); // Right stern
+                ctx.lineTo(-sSize * 0.7, sSize * 0.8); // Left stern
+                ctx.lineTo(-sSize * 0.7, 0); // Left mid
+                ctx.closePath();
+                ctx.fill();
+                // Cabin
+                ctx.fillStyle = getThemeColor('--enemy-ship-accent');
+                ctx.fillRect(-sSize * 0.4, -sSize * 0.1, sSize * 0.8, sSize * 0.5);
+
+            } else { // Heli
+                const hSize = e.size * 1.2;
+                // Tail boom
+                ctx.fillStyle = getThemeColor('--enemy-heli-color');
+                ctx.fillRect(-hSize * 0.2, hSize * 0.5, hSize * 0.4, hSize * 0.8);
+                // Tail rotor
+                ctx.fillStyle = getThemeColor('--enemy-heli-accent');
+                ctx.fillRect(-hSize * 0.4, hSize * 1.2, hSize * 0.8, hSize * 0.15);
+                
+                // Main body (bubble)
+                ctx.fillStyle = getThemeColor('--enemy-heli-color');
+                ctx.beginPath();
+                ctx.arc(0, 0, hSize * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Rotor (animated line)
+                ctx.strokeStyle = getThemeColor('--enemy-heli-accent');
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.5;
+                ctx.save();
+                ctx.rotate(rotorAngle);
+                ctx.beginPath();
+                ctx.moveTo(-hSize * 1.2, 0);
+                ctx.lineTo(hSize * 1.2, 0);
+                ctx.stroke();
+                ctx.restore();
+                ctx.globalAlpha = 1.0;
+            }
+            ctx.restore();
+        }
+
+        function drawPlayer() {
+            if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2 === 0) {
+                return; // Blink
+            }
+            
+            const pSize = player.size; // Use original size
+            const pColor = getThemeColor('--player-color');
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            // --- Draw New Jet Shape ---
+            ctx.fillStyle = pColor;
+            ctx.strokeStyle = pColor;
+            ctx.lineWidth = 2;
+
+            // Main Fuselage
+            ctx.beginPath();
+            ctx.moveTo(0, -pSize * 0.9); // Nose
+            ctx.quadraticCurveTo(pSize * 0.4, -pSize * 0.3, pSize * 0.5, pSize * 0.7); // Right side
+            ctx.lineTo(pSize * 0.2, pSize * 0.8); // Right exhaust
+            ctx.lineTo(-pSize * 0.2, pSize * 0.8); // Left exhaust
+            ctx.lineTo(-pSize * 0.5, pSize * 0.7); // Left side
+            ctx.quadraticCurveTo(-pSize * 0.4, -pSize * 0.3, 0, -pSize * 0.9); // Left nose
+            ctx.closePath();
+            ctx.fill();
+
+            // Wings
+            ctx.beginPath();
+            ctx.moveTo(pSize * 0.4, 0); // Right wing root
+            ctx.lineTo(pSize, pSize * 0.2); // Right wing tip
+            ctx.lineTo(pSize * 0.4, pSize * 0.3); // Right wing back
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-pSize * 0.4, 0); // Left wing root
+            ctx.lineTo(-pSize, pSize * 0.2); // Left wing tip
+            ctx.lineTo(-pSize * 0.4, pSize * 0.3); // Left wing back
+            ctx.closePath();
+            ctx.fill();
+            
+            // Tailfin
+            ctx.beginPath();
+            ctx.moveTo(0, pSize * 0.5);
+            ctx.lineTo(pSize * 0.2, pSize * 0.9);
+            ctx.lineTo(0, pSize * 0.8);
+            ctx.lineTo(-pSize * 0.2, pSize * 0.9);
+            ctx.closePath();
+            ctx.fill();
+
+            // Cockpit
+            ctx.fillStyle = getThemeColor('--player-accent');
+            ctx.beginPath();
+            ctx.arc(0, -pSize * 0.25, pSize * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        function drawHUD() {
+            // Fuel Gauge
+            const fuelBarWidth = 100;
+            const fuelBarHeight = 15;
+            ctx.fillStyle = getThemeColor('--fuel-bar-bg');
+            ctx.fillRect(10, canvas.height - 30, fuelBarWidth, fuelBarHeight);
+            
+            ctx.fillStyle = getThemeColor('--fuel-bar-fill');
+            ctx.fillRect(10, canvas.height - 30, fuelBarWidth * (fuel / 100), fuelBarHeight);
+            
+            ctx.fillStyle = getThemeColor('--text-main');
+            ctx.font = '12px Orbitron';
+            ctx.fillText('FUEL', 10, canvas.height - 35);
+            
+            // Lives
+            ctx.fillStyle = getThemeColor('--player-color');
+            ctx.font = '16px Orbitron';
+            ctx.textAlign = 'right';
+            ctx.fillText(`LIVES: ${lives}`, canvas.width - 10, canvas.height - 20);
+            ctx.textAlign = 'left';
+        }
+
+        function drawRadar() {
+            const radarX = RADAR_SIZE / 2;
+            const radarY = RADAR_SIZE / 2;
+            const radarRadius = RADAR_SIZE / 2 - 2; // -2 for padding
+            
+            radarCtx.clearRect(0, 0, RADAR_SIZE, RADAR_SIZE);
+            
+            // Draw background
+            radarCtx.fillStyle = getThemeColor('--radar-bg');
+            radarCtx.beginPath();
+            radarCtx.arc(radarX, radarY, radarRadius, 0, Math.PI * 2);
+            radarCtx.fill();
+            
+            // Draw sweep
+            radarSweepAngle = (radarSweepAngle + 0.05) % (Math.PI * 2);
+            radarCtx.strokeStyle = getThemeColor('--radar-sweep');
+            radarCtx.lineWidth = 2;
+            radarCtx.beginPath();
+            radarCtx.moveTo(radarX, radarY);
+            radarCtx.lineTo(radarX + Math.cos(radarSweepAngle) * radarRadius, radarY + Math.sin(radarSweepAngle) * radarRadius);
+            radarCtx.stroke();
+            
+            // Draw player blip (center)
+            radarCtx.fillStyle = getThemeColor('--player-color');
+            radarCtx.fillRect(radarX - 1, radarY - 1, 3, 3);
+            
+            // Function to draw a blip
+            const drawBlip = (item, color) => {
+                const dx = item.x - player.x;
+                const dy = item.y - player.y;
+                const dist = Math.hypot(dx, dy);
+                
+                if (dist < RADAR_RANGE) {
+                    const blipX = (dx / RADAR_RANGE) * radarRadius + radarX;
+                    const blipY = (dy / RADAR_RANGE) * radarRadius + radarY;
+                    
+                    // Ensure blip is inside radar circle
+                    const distToCenter = Math.hypot(blipX - radarX, blipY - radarY);
+                    if (distToCenter < radarRadius) {
+                        radarCtx.fillStyle = color;
+                        radarCtx.fillRect(blipX - 1, blipY - 1, 3, 3);
+                    }
+                }
+            };
+            
+            // Draw entities
+            enemies.forEach(e => drawBlip(e, getThemeColor(e.type === 'ship' ? '--enemy-ship-color' : '--enemy-heli-color')));
+            fuelDepots.forEach(f => drawBlip(f, getThemeColor('--fuel-depot-color')));
+            bridges.forEach(b => drawBlip({x: canvas.width / 2, y: b.y}, getThemeColor('--bridge-color')));
+            
+            // Draw border
+            radarCtx.strokeStyle = getThemeColor('--radar-border');
+            radarCtx.lineWidth = 1;
+            radarCtx.beginPath();
+            radarCtx.arc(radarX, radarY, radarRadius, 0, Math.PI * 2);
+            radarCtx.stroke();
+        }
+
+        function gameLoop() {
+            if (isGameOver) return;
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // --- 7. Collision & Helpers ---
+        function isColliding(a, b) {
+            // Simple square collision
+            return (
+                a.x - a.size / 2 < b.x + b.size / 2 &&
+                a.x + a.size / 2 > b.x - b.size / 2 &&
+                a.y - a.size / 2 < b.y + b.size / 2 &&
+                a.y + a.size / 2 > b.y - b.size / 2
+            );
+        }
+        
+        // --- 8. Event Listeners ---
+        startBtn.addEventListener('click', async () => {
+            // Initialize audio on first user click
+            if (!audioReady) {
+                await Tone.start();
+                audioReady = true;
+            }
+            initGame();
+        });
+
+        // Keyboard Controls
+        document.addEventListener('keydown', e => {
+            if (isGameOver || isPaused) {
+                if(e.key === 'Enter') startBtn.click();
+                return;
+            }
+            switch (e.key) {
+                case 'ArrowLeft': case 'a': moveLeft = true; break;
+                case 'ArrowRight': case 'd': moveRight = true; break;
+                case 'ArrowUp': case 'w': moveFast = true; break;
+                case 'ArrowDown': case 's': moveSlow = true; break;
+                case ' ': shooting = true; break;
+            }
+        });
+        document.addEventListener('keyup', e => {
+            switch (e.key) {
+                case 'ArrowLeft': case 'a': moveLeft = false; break;
+                case 'ArrowRight': case 'd': moveRight = false; break;
+                case 'ArrowUp': case 'w': moveFast = false; break;
+                case 'ArrowDown': case 's': moveSlow = false; break;
+                case ' ': shooting = false; break;
+            }
+        });
+        
+        // Mobile Button Controls
+        function bindBtn(id, flagName) {
+            const btn = document.getElementById(id);
+            const start = (e) => { e.preventDefault(); window[flagName] = true; btn.classList.add('active-state'); };
+            const end = (e) => { e.preventDefault(); window[flagName] = false; btn.classList.remove('active-state'); };
+            
+            btn.addEventListener('touchstart', start, { passive: false });
+            btn.addEventListener('touchend', end);
+            btn.addEventListener('touchcancel', end);
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('mouseup', end);
+            btn.addEventListener('mouseleave', end);
+        }
+        
+        bindBtn('btn-left', 'moveLeft');
+        bindBtn('btn-right', 'moveRight');
+        bindBtn('btn-fast', 'moveFast');
+        bindBtn('btn-slow', 'moveSlow');
+        bindBtn('btn-fire', 'shooting');
+        
+        // Handle window resize
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            let containerWidth = container.clientWidth;
+            // 9:16 aspect ratio
+            let newWidth = Math.min(containerWidth, 400); // Max width
+            let newHeight = newWidth * (16 / 9);
+
+            if (newHeight > container.clientHeight) {
+                newHeight = container.clientHeight;
+                newWidth = newHeight * (9 / 16);
+            }
+
+            canvas.style.width = `${newWidth}px`;
+            canvas.style.height = `${newHeight}px`;
+            
+            // Set fixed internal resolution
+            canvas.width = 400;
+            canvas.height = 711; // 9:16
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        resizeCanvas();
+    </script>
+</body>
+</html>
