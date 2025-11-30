@@ -19,7 +19,6 @@
 - Snake
 - Breakout
 - 2048
-- 
 **Coming next**
 
 - Minesweeper
